@@ -1,0 +1,61 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+enum WatchStatus {
+  PLANNED
+  WATCHING
+  COMPLETED
+  DROPPED
+}
+
+model User {
+  id              Int              @id @default(autoincrement())
+  email           String           @unique
+  passwordHash    String
+  firstName       String
+  lastName        String
+  createdAt       DateTime         @default(now())
+  series          Series[]
+  watchedEpisodes WatchedEpisode[]
+}
+
+model Series {
+  id             Int         @id @default(autoincrement())
+  userId         Int
+  user           User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tmdbId         Int
+  name           String      @default("")
+  posterPath     String?
+  year           String?
+  status         WatchStatus @default(PLANNED)
+  currentSeason  Int         @default(0)
+  currentEpisode Int         @default(0)
+  rating         Int?
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+
+  @@unique([userId, tmdbId])
+}
+
+model WatchedEpisode {
+  id            Int      @id @default(autoincrement())
+  userId        Int
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tmdbId        Int
+  seasonNumber  Int
+  episodeNumber Int
+  watchedAt     DateTime @default(now())
+
+  @@unique([userId, tmdbId, seasonNumber, episodeNumber])
+}
