@@ -208,6 +208,76 @@ a {
 
 /* series detail */
 
+.series-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background-size: cover;
+  background-position: center;
+}
+
+.series-backdrop::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(6, 4, 12, 0.72);
+}
+
+.background-picker {
+  margin-top: 2rem;
+}
+
+.background-picker-label {
+  display: block;
+  font-size: 0.85rem;
+  color: rgba(180, 180, 190, 0.8);
+  margin-bottom: 0.5rem;
+}
+
+.background-picker-row {
+  display: flex;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.background-thumb {
+  width: 96px;
+  aspect-ratio: 16 / 9;
+  padding: 0;
+  border: 2px solid transparent;
+  border-radius: 6px;
+  overflow: hidden;
+  cursor: pointer;
+  background: rgba(128, 128, 128, 0.15);
+  opacity: 0.7;
+  transition: opacity 0.15s ease, border-color 0.15s ease;
+}
+
+.background-thumb:hover {
+  opacity: 1;
+}
+
+.background-thumb[data-active="true"] {
+  border-color: #7c3aed;
+  opacity: 1;
+}
+
+.background-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.background-thumb-clear {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  color: rgba(220, 220, 225, 0.8);
+  opacity: 1;
+}
+
 .series-page {
   width: 100vw;
   position: relative;
@@ -222,7 +292,12 @@ a {
 .series-detail {
   display: grid;
   grid-template-columns: 280px 1fr;
-  gap: 2rem;
+  gap: 3.25rem;
+}
+
+.series-poster-col {
+  position: relative;
+  min-width: 0;
 }
 
 .series-content {
@@ -331,6 +406,17 @@ a {
   color: #000;
 }
 
+.rating-logo-site {
+  background: #7c3aed;
+  color: #fff;
+}
+
+.rating-count {
+  color: rgba(180, 180, 190, 0.7);
+  font-weight: 500;
+  font-size: 0.8rem;
+}
+
 .rating-logo-icon {
   height: 1.2rem;
   width: auto;
@@ -349,6 +435,96 @@ a {
   line-height: 1.6;
   color: rgba(220, 220, 225, 0.9);
   max-width: 65ch;
+}
+
+/* пользовательский рейтинг — 10 звёзд */
+
+.star-rating {
+  display: inline-flex;
+  gap: 0.15rem;
+}
+
+.star-slot {
+  position: relative;
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  font-size: 1.4rem;
+  line-height: 1;
+  transition: transform 0.1s ease;
+}
+
+.star-slot:hover {
+  transform: scale(1.15);
+}
+
+.star-bg {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  color: rgba(255, 255, 255, 0.25);
+}
+
+.star-fill-wrap {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.star-fill {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  display: inline-block;
+  color: #ffc850;
+}
+
+.star-hit {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 50%;
+  border: none;
+  background: none;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+  z-index: 1;
+}
+
+.star-hit-bottom {
+  bottom: 0;
+}
+
+.star-hit-top {
+  top: 0;
+}
+
+.rating-variant-side {
+  position: absolute;
+  top: 7.5%;
+  bottom: 7.5%;
+  right: -2.2rem;
+  display: flex;
+}
+
+.star-rating-vertical {
+  flex-direction: column-reverse;
+  justify-content: space-between;
+  height: 100%;
+  gap: 0;
+}
+
+.star-rating-vertical .star-slot {
+  font-size: 1.9rem;
+}
+
+.rating-variant-title .star {
+  font-size: 1.3rem;
 }
 
 .season-picker {

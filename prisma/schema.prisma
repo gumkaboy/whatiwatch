@@ -41,7 +41,8 @@ model Series {
   status         WatchStatus @default(PLANNED)
   currentSeason  Int         @default(0)
   currentEpisode Int         @default(0)
-  rating         Int?
+  rating         Float?
+  backgroundPath String?
   createdAt      DateTime    @default(now())
   updatedAt      DateTime    @updatedAt
 

@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import {
   genreLabel,
   getSeasonEpisodes,
+  getSeriesBackdrops,
   getSeriesDetails,
   getSeriesExternalIds,
   getSeriesTrailerKey,
@@ -14,6 +15,8 @@ import { getKinopoiskRating } from "@/lib/kinopoisk";
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth";
 import { TrackingForm } from "@/components/TrackingForm";
+import { StarRating } from "@/components/StarRating";
+import { BackgroundPicker } from "@/components/BackgroundPicker";
 
 export default async function SeriesPage({
   params,
@@ -27,13 +30,23 @@ export default async function SeriesPage({
   const session = await auth();
   const userId = Number(session!.user.id);
 
-  const [series, tracking, trailerKey, externalIds, watchedEpisodes] = await Promise.all([
-    getSeriesDetails(tmdbId).catch(() => null),
-    prisma.series.findUnique({ where: { userId_tmdbId: { userId, tmdbId } } }),
-    getSeriesTrailerKey(tmdbId).catch(() => null),
-    getSeriesExternalIds(tmdbId).catch(() => null),
-    prisma.watchedEpisode.findMany({ where: { userId, tmdbId } }),
-  ]);
+  const [series, tracking, trailerKey, externalIds, watchedEpisodes, siteRatingAgg, backdrops] =
+    await Promise.all([
+      getSeriesDetails(tmdbId).catch(() => null),
+      prisma.series.findUnique({ where: { userId_tmdbId: { userId, tmdbId } } }),
+      getSeriesTrailerKey(tmdbId).catch(() => null),
+      getSeriesExternalIds(tmdbId).catch(() => null),
+      prisma.watchedEpisode.findMany({ where: { userId, tmdbId } }),
+      prisma.series.aggregate({
+        where: { tmdbId, rating: { not: null } },
+        _avg: { rating: true },
+        _count: { rating: true },
+      }),
+      getSeriesBackdrops(tmdbId).catch(() => []),
+    ]);
+
+  const siteRating = siteRatingAgg._avg.rating;
+  const siteRatingCount = siteRatingAgg._count.rating;
 
   if (!series) notFound();
 
@@ -76,16 +89,39 @@ export default async function SeriesPage({
   });
 
   const poster = tmdbImageUrl(series.poster_path, "w500");
+  const initialUserRating = tracking?.rating ?? null;
+  const seriesYear = series.first_air_date?.slice(0, 4) ?? null;
+  const backgroundUrl = tmdbImageUrl(tracking?.backgroundPath ?? null, "original");
 
   return (
     <div className="series-page">
+      {backgroundUrl && (
+        <div
+          className="series-backdrop"
+          style={{ backgroundImage: `url(${backgroundUrl})` }}
+        />
+      )}
+
       <div className="series-detail">
-        {poster ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img src={poster} alt={series.name} className="series-detail-poster" />
-        ) : (
-          <div className="series-detail-poster" />
-        )}
+        <div className="series-poster-col">
+          {poster ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={poster} alt={series.name} className="series-detail-poster" />
+          ) : (
+            <div className="series-detail-poster" />
+          )}
+
+          <div className="rating-variant-side">
+            <StarRating
+              tmdbId={tmdbId}
+              name={series.name}
+              posterPath={series.poster_path}
+              year={seriesYear}
+              initialRating={initialUserRating}
+              className="star-rating-vertical"
+            />
+          </div>
+        </div>
 
         <div className="series-content">
           <div className="series-info">
@@ -101,7 +137,7 @@ export default async function SeriesPage({
                 {watchedCount}/{series.number_of_episodes} серий
               </span>
             </p>
-            {(imdbRating || kinopoiskRating) && (
+            {(imdbRating || kinopoiskRating || siteRatingCount > 0) && (
               <div className="series-rating-badges">
                 {imdbRating && (
                   <span className="rating-item">
@@ -116,11 +152,22 @@ export default async function SeriesPage({
                     {kinopoiskRating.rating.toFixed(1)}
                   </span>
                 )}
+                {siteRatingCount > 0 && siteRating != null && (
+                  <span
+                    className="rating-item"
+                    title={`Оценили: ${siteRatingCount} чел.`}
+                  >
+                    <span className="rating-logo rating-logo-site">★</span>
+                    {siteRating.toFixed(1)}
+                    <span className="rating-count">({siteRatingCount})</span>
+                  </span>
+                )}
               </div>
             )}
             {series.status && (
               <p className="series-status">{seriesStatusLabel(series.status)}</p>
             )}
+
             <p className="series-overview">{series.overview || "Описание отсутствует."}</p>
           </div>
 
@@ -139,17 +186,23 @@ export default async function SeriesPage({
 
       <TrackingForm
         tmdbId={tmdbId}
-        name={series.name}
         posterPath={series.poster_path}
-        year={series.first_air_date?.slice(0, 4) ?? null}
         seasons={series.seasons}
         episodesBySeasonNumber={episodesBySeasonNumber}
         watchedBySeasonNumber={watchedBySeasonNumber}
         hasTracking={!!tracking}
-        createdAt={tracking?.createdAt.toLocaleDateString("ru-RU") ?? null}
-        initialStatus={tracking?.status ?? "PLANNED"}
-        initialEpisode={tracking?.currentEpisode ?? 0}
-        initialRating={tracking?.rating ?? null}
+        seriesName={series.name}
+        seriesYear={seriesYear}
+        episodeCount={series.number_of_episodes}
+      />
+
+      <BackgroundPicker
+        tmdbId={tmdbId}
+        name={series.name}
+        posterPath={series.poster_path}
+        year={seriesYear}
+        backdrops={backdrops.map((b) => b.file_path)}
+        initialBackgroundPath={tracking?.backgroundPath ?? null}
       />
     </div>
   );

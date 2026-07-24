@@ -9,7 +9,6 @@ const FILTERS: { value: WatchStatus | "ALL"; label: string }[] = [
   { value: "WATCHING", label: "Смотрю" },
   { value: "PLANNED", label: "В планах" },
   { value: "COMPLETED", label: "Просмотрено" },
-  { value: "DROPPED", label: "Брошено" },
 ];
 
 export default async function LibraryPage({

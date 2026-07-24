@@ -3,41 +3,19 @@
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { auth, signOut } from "@/lib/auth";
-import { WatchStatus } from "@/generated/prisma/client";
 
 export async function signOutAction() {
   await signOut({ redirectTo: "/login" });
 }
 
-export async function saveTracking(formData: FormData) {
-  const session = await auth();
-  if (!session?.user) throw new Error("Не авторизован");
-  const userId = Number(session.user.id);
-
-  const tmdbId = Number(formData.get("tmdbId"));
-  const name = String(formData.get("name") ?? "");
-  const posterPath = (formData.get("posterPath") as string) || null;
-  const year = (formData.get("year") as string) || null;
-  const status = formData.get("status") as WatchStatus;
-  const currentSeason = Number(formData.get("currentSeason") || 0);
-  const currentEpisode = Number(formData.get("currentEpisode") || 0);
-  const ratingRaw = formData.get("rating");
-  const rating = ratingRaw && ratingRaw !== "" ? Number(ratingRaw) : null;
-
-  await prisma.series.upsert({
-    where: { userId_tmdbId: { userId, tmdbId } },
-    update: { name, posterPath, year, status, currentSeason, currentEpisode, rating },
-    create: { userId, tmdbId, name, posterPath, year, status, currentSeason, currentEpisode, rating },
-  });
-
-  revalidatePath(`/series/${tmdbId}`);
-  revalidatePath("/library");
-}
-
 export async function toggleEpisodeWatched(
   tmdbId: number,
   seasonNumber: number,
-  episodeNumber: number
+  episodeNumber: number,
+  name: string,
+  posterPath: string | null,
+  year: string | null,
+  episodeCount: number
 ) {
   const session = await auth();
   if (!session?.user) throw new Error("Не авторизован");
@@ -56,6 +34,62 @@ export async function toggleEpisodeWatched(
       data: { userId, tmdbId, seasonNumber, episodeNumber },
     });
   }
+
+  const watchedCount = await prisma.watchedEpisode.count({ where: { userId, tmdbId } });
+  const status =
+    watchedCount === 0
+      ? "PLANNED"
+      : episodeCount > 0 && watchedCount >= episodeCount
+        ? "COMPLETED"
+        : "WATCHING";
+
+  await prisma.series.upsert({
+    where: { userId_tmdbId: { userId, tmdbId } },
+    update: { status, name, posterPath, year },
+    create: { userId, tmdbId, name, posterPath, year, status },
+  });
+
+  revalidatePath(`/series/${tmdbId}`);
+  revalidatePath("/library");
+}
+
+export async function setRating(
+  tmdbId: number,
+  name: string,
+  posterPath: string | null,
+  year: string | null,
+  rating: number | null
+) {
+  const session = await auth();
+  if (!session?.user) throw new Error("Не авторизован");
+  const userId = Number(session.user.id);
+
+  await prisma.series.upsert({
+    where: { userId_tmdbId: { userId, tmdbId } },
+    update: { rating },
+    create: { userId, tmdbId, name, posterPath, year, rating },
+  });
+
+  revalidatePath(`/series/${tmdbId}`);
+  revalidatePath("/library");
+}
+
+export async function setSeriesBackground(
+  tmdbId: number,
+  name: string,
+  posterPath: string | null,
+  year: string | null,
+  backgroundPath: string | null
+) {
+  const session = await auth();
+  if (!session?.user) throw new Error("Не авторизован");
+  const userId = Number(session.user.id);
+
+  await prisma.series.upsert({
+    where: { userId_tmdbId: { userId, tmdbId } },
+    update: { backgroundPath },
+    create: { userId, tmdbId, name, posterPath, year, backgroundPath },
+  });
 
   revalidatePath(`/series/${tmdbId}`);
 }

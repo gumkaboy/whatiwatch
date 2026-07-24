@@ -13,12 +13,20 @@ export function EpisodeRow({
   episodes,
   watchedEpisodeNumbers,
   fallbackImagePath,
+  seriesName,
+  seriesPosterPath,
+  seriesYear,
+  episodeCount,
 }: {
   tmdbId: number;
   seasonNumber: number;
   episodes: TmdbEpisode[];
   watchedEpisodeNumbers: number[];
   fallbackImagePath: string | null;
+  seriesName: string;
+  seriesPosterPath: string | null;
+  seriesYear: string | null;
+  episodeCount: number;
 }) {
   const [page, setPage] = useState(0);
   const [watchedSet, setWatchedSet] = useState(() => new Set(watchedEpisodeNumbers));
@@ -38,7 +46,15 @@ export function EpisodeRow({
       return next;
     });
 
-    toggleEpisodeWatched(tmdbId, seasonNumber, episodeNumber).catch(() => {
+    toggleEpisodeWatched(
+      tmdbId,
+      seasonNumber,
+      episodeNumber,
+      seriesName,
+      seriesPosterPath,
+      seriesYear,
+      episodeCount
+    ).catch(() => {
       // не удалось сохранить — откатываем оптимистичное обновление
       setWatchedSet((prev) => {
         const next = new Set(prev);

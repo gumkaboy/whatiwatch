@@ -140,6 +140,21 @@ export async function getSeriesExternalIds(tmdbId: number) {
   return tmdbFetch<TmdbExternalIds>(`/tv/${tmdbId}/external_ids`);
 }
 
+export interface TmdbBackdrop {
+  file_path: string;
+}
+
+interface TmdbImagesResult {
+  backdrops: TmdbBackdrop[];
+}
+
+export async function getSeriesBackdrops(tmdbId: number) {
+  const data = await tmdbFetch<TmdbImagesResult>(`/tv/${tmdbId}/images`, {
+    include_image_language: "en,ru,null",
+  });
+  return data.backdrops.slice(0, 12);
+}
+
 export function tmdbImageUrl(
   path: string | null,
   size: "w200" | "w300" | "w342" | "w500" | "original" = "w342"
