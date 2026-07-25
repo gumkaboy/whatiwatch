@@ -801,9 +801,6 @@ a {
   background: rgba(124, 58, 237, 0.85);
 }
 
-.episode-card[data-watched="true"] .episode-thumb {
-  opacity: 0.2;
-}
 
 .episode-title {
   margin-top: 0.4rem;
