@@ -738,6 +738,7 @@ a {
   object-fit: cover;
   display: block;
   background: rgba(128, 128, 128, 0.2);
+  filter: brightness(1.12);
 }
 
 .episode-thumb-unaired {
