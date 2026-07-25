@@ -78,10 +78,6 @@ export function getSeriesDetails(tmdbId: number) {
   return tmdbFetch<TmdbSeriesDetails>(`/tv/${tmdbId}`);
 }
 
-export function getPopularSeries() {
-  return tmdbFetch<TmdbSeriesSearchResult>("/tv/popular");
-}
-
 interface TmdbVideo {
   key: string;
   site: string;

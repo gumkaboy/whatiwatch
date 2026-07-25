@@ -237,7 +237,7 @@ export default async function SeriesPage({
         watchedBySeasonNumber={watchedBySeasonNumber}
         seriesName={series.name}
         seriesYear={seriesYear}
-        episodeCount={series.number_of_episodes}
+        episodeCount={airedEpisodesAll.length}
       />
 
       <BackgroundPicker

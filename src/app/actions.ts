@@ -175,7 +175,7 @@ export async function markAllAiredWatched(tmdbId: number) {
   const status =
     watchedCount === 0
       ? "PLANNED"
-      : series.number_of_episodes > 0 && watchedCount >= series.number_of_episodes
+      : airedEpisodes.length > 0 && watchedCount >= airedEpisodes.length
         ? "COMPLETED"
         : "WATCHING";
   const name = series.name;
