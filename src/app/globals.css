@@ -356,8 +356,9 @@ a {
   box-shadow:
     0 5px 12px rgba(0, 0, 0, 0.5),
     0 20px 52px rgba(0, 0, 0, 0.6),
-    0 56px 152px -27px rgba(168, 85, 247, 0.81),
-    0 27px 83px -20px rgba(236, 72, 153, 0.69);
+    0 0 0 2px rgba(217, 70, 239, 0.6),
+    0 0 14px 2px rgba(168, 85, 247, 0.85),
+    0 0 28px 4px rgba(236, 72, 153, 0.55);
 }
 
 .series-title-row {
