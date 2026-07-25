@@ -802,6 +802,10 @@ a {
 }
 
 
+.episode-card[data-watched="true"] .episode-thumb {
+  filter: brightness(0.45);
+}
+
 .episode-title {
   margin-top: 0.4rem;
   font-size: 0.8rem;
