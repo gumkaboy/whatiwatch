@@ -961,8 +961,31 @@ a {
 /* auth pages */
 
 .auth-page {
-  max-width: 360px;
-  margin: 2rem auto;
+  max-width: 380px;
+  margin: 4rem auto;
+  padding: 2.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(16px) saturate(160%);
+  -webkit-backdrop-filter: blur(16px) saturate(160%);
+  box-shadow:
+    0 20px 50px rgba(0, 0, 0, 0.45),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.auth-page h1 {
+  text-align: center;
+}
+
+.auth-page p {
+  text-align: center;
+  margin-top: 1rem;
+  font-size: 0.9rem;
+}
+
+.auth-page a {
+  color: #a78bfa;
 }
 
 .profile-page {
@@ -993,22 +1016,37 @@ a {
 }
 
 .auth-form input {
-  padding: 0.6rem 0.8rem;
-  border: 1px solid rgba(128, 128, 128, 0.4);
-  border-radius: 6px;
-  background: transparent;
+  padding: 0.7rem 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.06);
   color: inherit;
   font-size: 1rem;
+  transition:
+    border-color 0.15s ease,
+    background 0.15s ease;
+}
+
+.auth-form input:focus {
+  outline: none;
+  border-color: #7c3aed;
+  background: rgba(255, 255, 255, 0.1);
 }
 
 .auth-form button {
-  padding: 0.6rem 1rem;
-  border: 1px solid rgba(128, 128, 128, 0.4);
-  border-radius: 6px;
-  background: transparent;
-  color: inherit;
+  padding: 0.75rem 1rem;
+  border: none;
+  border-radius: 999px;
+  background: #7c3aed;
+  color: #fff;
+  font-weight: 600;
   cursor: pointer;
   font-size: 1rem;
+  transition: background 0.15s ease;
+}
+
+.auth-form button:hover {
+  background: #6d28d9;
 }
 
 .auth-form button:hover {
