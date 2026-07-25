@@ -11,6 +11,7 @@ export async function registerAction(formData: FormData) {
     .trim()
     .toLowerCase();
   const password = String(formData.get("password") ?? "");
+  const confirmPassword = String(formData.get("confirmPassword") ?? "");
   const firstName = String(formData.get("firstName") ?? "").trim();
   const lastName = String(formData.get("lastName") ?? "").trim();
 
@@ -19,6 +20,9 @@ export async function registerAction(formData: FormData) {
   }
   if (password.length < 8) {
     redirect("/register?error=weak_password");
+  }
+  if (password !== confirmPassword) {
+    redirect("/register?error=password_mismatch");
   }
   if (!firstName || !lastName) {
     redirect("/register?error=missing_name");

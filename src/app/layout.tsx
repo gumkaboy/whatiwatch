@@ -41,7 +41,9 @@ export default async function RootLayout({
                 <>
                   <Link href="/search">Поиск</Link>
                   <Link href="/library">Моя библиотека</Link>
-                  <span className="site-nav-email">{session.user.name}</span>
+                  <Link href="/profile" className="site-nav-email">
+                    {session.user.name}
+                  </Link>
                   <form action={signOutAction} style={{ display: "inline" }}>
                     <button type="submit" className="site-nav-signout">
                       Выйти

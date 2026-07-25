@@ -1,6 +1,6 @@
 import type { NextAuthConfig } from "next-auth";
 
-const AUTH_PAGES = ["/login", "/register"];
+const AUTH_PAGES = ["/login", "/register", "/forgot-password", "/reset-password"];
 const PUBLIC_PAGES = ["/", ...AUTH_PAGES];
 
 export const authConfig = {

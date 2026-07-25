@@ -965,6 +965,27 @@ a {
   margin: 2rem auto;
 }
 
+.profile-page {
+  max-width: 480px;
+  margin: 2rem auto;
+}
+
+.profile-section {
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.profile-section h2 {
+  font-size: 1.2rem;
+  margin-bottom: 1rem;
+}
+
+.field input:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 .auth-form {
   display: grid;
   gap: 1rem;
@@ -996,6 +1017,12 @@ a {
 
 .auth-error {
   color: #d33;
+  margin-top: 0.75rem;
+  font-size: 0.9rem;
+}
+
+.auth-success {
+  color: #4ade80;
   margin-top: 0.75rem;
   font-size: 0.9rem;
 }

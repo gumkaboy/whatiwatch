@@ -6,6 +6,7 @@ const ERROR_MESSAGES: Record<string, string> = {
   weak_password: "Пароль должен быть не короче 8 символов.",
   email_taken: "Этот email уже зарегистрирован.",
   missing_name: "Укажите имя и фамилию.",
+  password_mismatch: "Пароли не совпадают.",
 };
 
 export default async function RegisterPage({
@@ -35,6 +36,16 @@ export default async function RegisterPage({
         <div className="field">
           <label htmlFor="password">Пароль</label>
           <input id="password" name="password" type="password" minLength={8} required />
+        </div>
+        <div className="field">
+          <label htmlFor="confirmPassword">Подтвердите пароль</label>
+          <input
+            id="confirmPassword"
+            name="confirmPassword"
+            type="password"
+            minLength={8}
+            required
+          />
         </div>
         <button type="submit">Зарегистрироваться</button>
       </form>

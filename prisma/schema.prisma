@@ -20,15 +20,28 @@ enum WatchStatus {
 }
 
 model User {
-  id              Int              @id @default(autoincrement())
-  email           String           @unique
-  passwordHash    String
-  firstName       String
-  lastName        String
-  createdAt       DateTime         @default(now())
-  series          Series[]
-  watchedEpisodes WatchedEpisode[]
-  comments        Comment[]
+  id                  Int                 @id @default(autoincrement())
+  email               String              @unique
+  passwordHash        String
+  firstName           String
+  lastName            String
+  dateOfBirth         DateTime?
+  city                String?
+  createdAt           DateTime            @default(now())
+  series              Series[]
+  watchedEpisodes     WatchedEpisode[]
+  comments            Comment[]
+  passwordResetTokens PasswordResetToken[]
+}
+
+model PasswordResetToken {
+  id        Int       @id @default(autoincrement())
+  userId    Int
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  token     String    @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
 }
 
 model Series {
