@@ -174,7 +174,10 @@ export function tmdbImageUrl(
   size: "w200" | "w300" | "w342" | "w500" | "original" = "w342"
 ) {
   if (!path) return null;
-  return `https://image.tmdb.org/t/p/${size}${path}`;
+  // грузим через собственный прокси-роут (/api/tmdb-image), а не напрямую с
+  // image.tmdb.org — у части пользователей этот CDN заблокирован на уровне
+  // сети/провайдера, а у нашего сервера обычный доступ в интернет
+  return `/api/tmdb-image?size=${size}&path=${encodeURIComponent(path)}`;
 }
 
 const SERIES_STATUS_LABELS: Record<string, string> = {
