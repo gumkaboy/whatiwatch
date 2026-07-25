@@ -28,6 +28,7 @@ model User {
   createdAt       DateTime         @default(now())
   series          Series[]
   watchedEpisodes WatchedEpisode[]
+  comments        Comment[]
 }
 
 model Series {
@@ -56,7 +57,19 @@ model WatchedEpisode {
   tmdbId        Int
   seasonNumber  Int
   episodeNumber Int
+  runtime       Int?
   watchedAt     DateTime @default(now())
 
   @@unique([userId, tmdbId, seasonNumber, episodeNumber])
+}
+
+model Comment {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tmdbId    Int
+  text      String
+  createdAt DateTime @default(now())
+
+  @@index([tmdbId])
 }

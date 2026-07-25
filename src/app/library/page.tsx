@@ -2,12 +2,13 @@ import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth";
 import { SeriesCard } from "@/components/SeriesCard";
+import { LibraryStats } from "@/components/LibraryStats";
 import { WatchStatus } from "@/generated/prisma/client";
 
 const FILTERS: { value: WatchStatus | "ALL"; label: string }[] = [
   { value: "ALL", label: "Все" },
   { value: "WATCHING", label: "Смотрю" },
-  { value: "PLANNED", label: "В планах" },
+  { value: "PLANNED", label: "Хочу посмотреть" },
   { value: "COMPLETED", label: "Просмотрено" },
 ];
 
@@ -22,14 +23,36 @@ export default async function LibraryPage({
   const session = await auth();
   const userId = Number(session!.user.id);
 
-  const entries = await prisma.series.findMany({
-    where: activeFilter === "ALL" ? { userId } : { userId, status: activeFilter },
-    orderBy: { updatedAt: "desc" },
-  });
+  const [entries, watchedAgg, seriesInProgressCount] = await Promise.all([
+    prisma.series.findMany({
+      where: activeFilter === "ALL" ? { userId } : { userId, status: activeFilter },
+      orderBy: { updatedAt: "desc" },
+    }),
+    prisma.watchedEpisode.aggregate({
+      where: { userId },
+      _count: { _all: true },
+      _sum: { runtime: true },
+    }),
+    prisma.series.count({
+      where: { userId, status: { in: ["WATCHING", "COMPLETED"] } },
+    }),
+  ]);
+
+  const episodesCount = watchedAgg._count._all;
+  const totalMinutes = watchedAgg._sum.runtime ?? 0;
+  const hours = Math.round(totalMinutes / 60);
+  const days = Math.round(hours / 24);
 
   return (
     <div>
       <h1>Моя библиотека</h1>
+
+      <LibraryStats
+        seriesCount={seriesInProgressCount}
+        episodesCount={episodesCount}
+        hours={hours}
+        days={days}
+      />
 
       <div className="library-filters">
         {FILTERS.map((f) => (

@@ -6,9 +6,12 @@ const globalForPrisma = globalThis as unknown as {
 };
 
 function createPrismaClient() {
-  // относительный путь от process.cwd() — не зависит от пробелов/спецсимволов
-  // в абсолютном пути проекта, которые ломают разбор "file:" URL
-  const adapter = new PrismaLibSql({ url: "file:./prisma/dev.db" });
+  // DATABASE_URL — облачная БД (Turso, libsql://...) в проде.
+  // Без неё — локальный файл (относительный путь от process.cwd(), не зависит
+  // от пробелов/спецсимволов в абсолютном пути проекта, которые ломают "file:" URL).
+  const url = process.env.DATABASE_URL ?? "file:./prisma/dev.db";
+  const authToken = process.env.DATABASE_AUTH_TOKEN;
+  const adapter = new PrismaLibSql({ url, authToken });
   return new PrismaClient({ adapter });
 }
 

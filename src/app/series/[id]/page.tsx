@@ -17,6 +17,8 @@ import { auth } from "@/lib/auth";
 import { TrackingForm } from "@/components/TrackingForm";
 import { StarRating } from "@/components/StarRating";
 import { BackgroundPicker } from "@/components/BackgroundPicker";
+import { SeriesActions } from "@/components/SeriesActions";
+import { CommentSection, type CommentItem } from "@/components/CommentSection";
 
 export default async function SeriesPage({
   params,
@@ -30,7 +32,7 @@ export default async function SeriesPage({
   const session = await auth();
   const userId = Number(session!.user.id);
 
-  const [series, tracking, trailerKey, externalIds, watchedEpisodes, siteRatingAgg, backdrops] =
+  const [series, tracking, trailerKey, externalIds, watchedEpisodes, siteRatingAgg, backdrops, comments] =
     await Promise.all([
       getSeriesDetails(tmdbId).catch(() => null),
       prisma.series.findUnique({ where: { userId_tmdbId: { userId, tmdbId } } }),
@@ -43,6 +45,11 @@ export default async function SeriesPage({
         _count: { rating: true },
       }),
       getSeriesBackdrops(tmdbId).catch(() => []),
+      prisma.comment.findMany({
+        where: { tmdbId },
+        orderBy: { createdAt: "desc" },
+        include: { user: { select: { firstName: true, lastName: true } } },
+      }),
     ]);
 
   const siteRating = siteRatingAgg._avg.rating;
@@ -67,26 +74,46 @@ export default async function SeriesPage({
 
   const genreText = series.genres.map(genreLabel).join(", ");
 
-  const imdbRating = externalIds?.imdb_id
-    ? await getImdbRating(externalIds.imdb_id).catch(() => null)
-    : null;
-
-  const kinopoiskRating = externalIds?.imdb_id
-    ? await getKinopoiskRating(series.name, externalIds.imdb_id).catch(() => null)
-    : null;
-
   const trackableSeasonNumbers = series.seasons
     .map((s) => s.season_number)
     .filter((n) => n > 0);
 
-  const episodesArrays = await Promise.all(
-    trackableSeasonNumbers.map((n) => getSeasonEpisodes(tmdbId, n).catch(() => []))
-  );
+  const [imdbRating, kinopoiskRating, episodesArrays] = await Promise.all([
+    externalIds?.imdb_id
+      ? getImdbRating(externalIds.imdb_id).catch(() => null)
+      : Promise.resolve(null),
+    externalIds?.imdb_id
+      ? getKinopoiskRating(series.name, externalIds.imdb_id).catch(() => null)
+      : Promise.resolve(null),
+    Promise.all(trackableSeasonNumbers.map((n) => getSeasonEpisodes(tmdbId, n).catch(() => []))),
+  ]);
 
   const episodesBySeasonNumber: Record<number, TmdbEpisode[]> = {};
   trackableSeasonNumbers.forEach((n, i) => {
     episodesBySeasonNumber[n] = episodesArrays[i];
   });
+
+  const now = new Date();
+  const airedEpisodesAll = trackableSeasonNumbers.flatMap((n) =>
+    (episodesBySeasonNumber[n] ?? [])
+      .filter((ep) => ep.air_date && new Date(ep.air_date) <= now)
+      .map((ep) => ({ seasonNumber: n, episodeNumber: ep.episode_number }))
+  );
+  const allAiredWatched =
+    airedEpisodesAll.length > 0 &&
+    airedEpisodesAll.every((e) => watchedBySeasonNumber[e.seasonNumber]?.includes(e.episodeNumber));
+
+  const networkLogo = series.networks[0]?.logo_path
+    ? tmdbImageUrl(series.networks[0].logo_path, "w300")
+    : null;
+
+  const commentItems: CommentItem[] = comments.map((c) => ({
+    id: c.id,
+    text: c.text,
+    createdAt: c.createdAt.toISOString(),
+    authorName: `${c.user.firstName} ${c.user.lastName}`.trim(),
+    isOwn: c.userId === userId,
+  }));
 
   const poster = tmdbImageUrl(series.poster_path, "w500");
   const initialUserRating = tracking?.rating ?? null;
@@ -125,7 +152,25 @@ export default async function SeriesPage({
 
         <div className="series-content">
           <div className="series-info">
-            <h1 className="series-title">{series.name}</h1>
+            <div className="series-title-row">
+              <h1 className="series-title">{series.name}</h1>
+              <SeriesActions
+                tmdbId={tmdbId}
+                name={series.name}
+                posterPath={series.poster_path}
+                year={seriesYear}
+                initialSaved={!!tracking}
+                initialAllWatched={allAiredWatched}
+              />
+            </div>
+            {networkLogo && (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={networkLogo}
+                alt={series.networks[0].name}
+                className="series-network-logo"
+              />
+            )}
             <p className="series-meta">
               <span>{yearRange}</span>
               <span className="meta-dot">·</span>
@@ -190,7 +235,6 @@ export default async function SeriesPage({
         seasons={series.seasons}
         episodesBySeasonNumber={episodesBySeasonNumber}
         watchedBySeasonNumber={watchedBySeasonNumber}
-        hasTracking={!!tracking}
         seriesName={series.name}
         seriesYear={seriesYear}
         episodeCount={series.number_of_episodes}
@@ -204,6 +248,8 @@ export default async function SeriesPage({
         backdrops={backdrops.map((b) => b.file_path)}
         initialBackgroundPath={tracking?.backgroundPath ?? null}
       />
+
+      <CommentSection tmdbId={tmdbId} initialComments={commentItems} />
     </div>
   );
 }

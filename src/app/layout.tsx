@@ -17,7 +17,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Series Tracker",
+  title: "whatiwatch",
   description: "Личный трекер сериалов",
 };
 

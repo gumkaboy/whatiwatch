@@ -67,6 +67,7 @@ export interface TmdbSeriesDetails {
   vote_average: number;
   status: string;
   seasons: TmdbSeason[];
+  networks: { id: number; name: string; logo_path: string | null }[];
 }
 
 export function searchSeries(query: string, page = 1) {
@@ -93,24 +94,37 @@ interface TmdbVideosResult {
   results: TmdbVideo[];
 }
 
-export async function getSeriesTrailerKey(tmdbId: number): Promise<string | null> {
-  const data = await tmdbFetch<TmdbVideosResult>(`/tv/${tmdbId}/videos`, {
-    language: "en-US",
-    include_video_language: "ru,en,null",
-  });
-
-  const videos = data.results.filter((v) => v.site === "YouTube");
+function pickTrailer(videos: TmdbVideo[]): TmdbVideo | undefined {
   const isRu = (v: TmdbVideo) => v.iso_639_1 === "ru";
+  const isEn = (v: TmdbVideo) => v.iso_639_1 === "en";
 
-  const trailer =
+  return (
     videos.find((v) => v.type === "Trailer" && v.official && isRu(v)) ??
     videos.find((v) => v.type === "Trailer" && isRu(v)) ??
-    videos.find((v) => v.type === "Trailer" && v.official) ??
-    videos.find((v) => v.type === "Trailer") ??
-    videos.find((v) => v.type === "Teaser") ??
-    videos[0];
+    videos.find((v) => v.type === "Teaser" && isRu(v)) ??
+    videos.find((v) => v.type === "Trailer" && v.official && isEn(v)) ??
+    videos.find((v) => v.type === "Trailer" && isEn(v)) ??
+    videos.find((v) => v.type === "Teaser" && isEn(v))
+  );
+}
 
-  return trailer?.key ?? null;
+export async function getSeriesTrailerKey(tmdbId: number): Promise<string | null> {
+  const params = { language: "en-US", include_video_language: "ru,en,null" };
+
+  const seasonData = await tmdbFetch<TmdbVideosResult>(
+    `/tv/${tmdbId}/season/1/videos`,
+    params
+  ).catch(() => ({ results: [] }) as TmdbVideosResult);
+
+  const seasonVideos = seasonData.results.filter((v) => v.site === "YouTube");
+  const seasonTrailer = pickTrailer(seasonVideos);
+  if (seasonTrailer) return seasonTrailer.key;
+
+  const seriesData = await tmdbFetch<TmdbVideosResult>(`/tv/${tmdbId}/videos`, params);
+  const seriesVideos = seriesData.results.filter((v) => v.site === "YouTube");
+  const seriesTrailer = pickTrailer(seriesVideos);
+
+  return seriesTrailer?.key ?? null;
 }
 
 export interface TmdbEpisode {

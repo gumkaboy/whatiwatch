@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import type { TmdbEpisode, TmdbSeason } from "@/lib/tmdb";
-import { removeTracking } from "@/app/actions";
 import { EpisodeRow } from "@/components/EpisodeRow";
 
 export function TrackingForm({
@@ -11,7 +10,6 @@ export function TrackingForm({
   seasons,
   episodesBySeasonNumber,
   watchedBySeasonNumber,
-  hasTracking,
   seriesName,
   seriesYear,
   episodeCount,
@@ -21,7 +19,6 @@ export function TrackingForm({
   seasons: TmdbSeason[];
   episodesBySeasonNumber: Record<number, TmdbEpisode[]>;
   watchedBySeasonNumber: Record<number, number[]>;
-  hasTracking: boolean;
   seriesName: string;
   seriesYear: string | null;
   episodeCount: number;
@@ -73,13 +70,6 @@ export function TrackingForm({
         seriesYear={seriesYear}
         episodeCount={episodeCount}
       />
-
-      {hasTracking && (
-        <form className="remove-form" action={removeTracking} style={{ marginTop: "1.5rem" }}>
-          <input type="hidden" name="tmdbId" value={tmdbId} />
-          <button type="submit">Убрать из библиотеки</button>
-        </form>
-      )}
     </>
   );
 }

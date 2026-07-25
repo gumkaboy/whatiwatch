@@ -39,6 +39,8 @@ export function EpisodeRow({
   const hasMore = page < totalPages - 1;
 
   function toggleWatched(episodeNumber: number) {
+    const runtime = episodes.find((e) => e.episode_number === episodeNumber)?.runtime ?? null;
+
     setWatchedSet((prev) => {
       const next = new Set(prev);
       if (next.has(episodeNumber)) next.delete(episodeNumber);
@@ -53,7 +55,8 @@ export function EpisodeRow({
       seriesName,
       seriesPosterPath,
       seriesYear,
-      episodeCount
+      episodeCount,
+      runtime
     ).catch(() => {
       // не удалось сохранить — откатываем оптимистичное обновление
       setWatchedSet((prev) => {

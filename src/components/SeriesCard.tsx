@@ -2,7 +2,7 @@ import Link from "next/link";
 import { tmdbImageUrl } from "@/lib/tmdb";
 
 const STATUS_LABELS: Record<string, string> = {
-  PLANNED: "В планах",
+  PLANNED: "Хочу посмотреть",
   WATCHING: "Смотрю",
   COMPLETED: "Просмотрено",
   DROPPED: "Брошено",
