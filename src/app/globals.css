@@ -222,9 +222,8 @@ a {
   position: fixed;
   inset: 0;
   z-index: -1;
-  background-size: contain;
+  background-size: cover;
   background-position: center;
-  background-repeat: no-repeat;
 }
 
 .series-backdrop::after {
