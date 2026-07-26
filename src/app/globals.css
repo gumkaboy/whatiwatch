@@ -1164,9 +1164,10 @@ a {
 }
 
 .brand-icon {
-  width: clamp(1.3rem, 6.7vw, 8.7rem);
+  width: clamp(4rem, 20vw, 26rem);
   height: clamp(4rem, 20vw, 26rem);
-  color: #fff;
+  object-fit: contain;
+  filter: brightness(0) invert(1);
   flex-shrink: 0;
 }
 

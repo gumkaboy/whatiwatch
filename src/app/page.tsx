@@ -60,10 +60,8 @@ export default async function HomePage() {
         <div className="landing-center">
           <h1 className="brand-title">
             w
-            <svg className="brand-icon" viewBox="0 0 8 24" fill="currentColor" aria-label="i" role="img">
-              <path d="M1.3 1h5.4l-1.4 14.5h-2.6z" />
-              <circle cx="4" cy="20" r="2.3" />
-            </svg>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/free-png.png" alt="i" className="brand-icon" />
             w
           </h1>
           <p>Личный трекер сериалов: что смотрите, что посмотрели, что в планах.</p>
