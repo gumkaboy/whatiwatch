@@ -25,7 +25,7 @@ export default async function HomePage() {
 
   return (
     <div className="landing-wrap">
-      <div className="landing-scatter">
+      <div className={`landing-scatter${session?.user ? "" : " landing-scatter--no-header"}`}>
         {posters.length > 0 &&
           LANES.map((lane, laneIndex) => {
             // рендерим последовательность дважды подряд и крутим её ровно на

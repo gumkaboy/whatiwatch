@@ -6,7 +6,7 @@ import { auth, signOut } from "@/lib/auth";
 import { getSeasonEpisodes, getSeriesDetails } from "@/lib/tmdb";
 
 export async function signOutAction() {
-  await signOut({ redirectTo: "/login" });
+  await signOut({ redirectTo: "/" });
 }
 
 export async function toggleEpisodeWatched(

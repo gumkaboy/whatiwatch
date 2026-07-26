@@ -34,26 +34,24 @@ export default async function RootLayout({
         <ScrollGradient />
         <div className="bg-gradient" />
         <div className="bg-gradient-overlay" />
-        <header className="site-header">
-          <nav className="site-nav">
-            <div className="site-nav-links">
-              {session?.user ? (
-                <>
-                  <Link href="/search">Поиск</Link>
-                  <Link href="/library">Моя библиотека</Link>
-                  <Link href="/profile" className="site-nav-email">
-                    {session.user.name}
-                  </Link>
-                  <form action={signOutAction} style={{ display: "inline" }}>
-                    <button type="submit" className="site-nav-signout">
-                      Выйти
-                    </button>
-                  </form>
-                </>
-              ) : null}
-            </div>
-          </nav>
-        </header>
+        {session?.user ? (
+          <header className="site-header">
+            <nav className="site-nav">
+              <div className="site-nav-links">
+                <Link href="/search">Поиск</Link>
+                <Link href="/library">Моя библиотека</Link>
+                <Link href="/profile" className="site-nav-email">
+                  {session.user.name}
+                </Link>
+                <form action={signOutAction} style={{ display: "inline" }}>
+                  <button type="submit" className="site-nav-signout">
+                    Выйти
+                  </button>
+                </form>
+              </div>
+            </nav>
+          </header>
+        ) : null}
         <main className="site-main">{children}</main>
       </body>
     </html>
