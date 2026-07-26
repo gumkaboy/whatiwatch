@@ -1149,7 +1149,7 @@ a {
 }
 
 .landing-center h1 {
-  font-size: clamp(4rem, 16vw, 10rem);
+  font-size: clamp(2.5rem, 12vw, 15rem);
   line-height: 1;
 }
 
@@ -1162,8 +1162,8 @@ a {
 }
 
 .brand-icon {
-  width: 1em;
-  height: 1em;
+  width: clamp(4rem, 20vw, 26rem);
+  height: clamp(4rem, 20vw, 26rem);
   flex-shrink: 0;
 }
 
