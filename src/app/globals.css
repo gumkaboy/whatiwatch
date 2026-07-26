@@ -1136,9 +1136,9 @@ a {
 
 .landing-center {
   position: absolute;
-  top: 50%;
+  top: 0;
   left: 50%;
-  transform: translate(-50%, -50%);
+  transform: translateX(-50%);
   width: min(96%, 900px);
   display: flex;
   flex-direction: column;
@@ -1148,20 +1148,10 @@ a {
   z-index: 2;
 }
 
-.landing-title {
-  position: absolute;
-  top: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  width: min(96%, 900px);
-  z-index: 2;
-}
-
-.landing-title h1 {
+.landing-center h1 {
   margin: 0;
   font-size: clamp(2.5rem, 12vw, 15rem);
   line-height: 1;
-  text-align: center;
   text-shadow: 0 2px 12px rgba(0, 0, 0, 0.7);
 }
 

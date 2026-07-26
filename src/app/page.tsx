@@ -57,7 +57,7 @@ export default async function HomePage() {
             );
           })}
 
-        <div className="landing-title">
+        <div className="landing-center">
           <h1 className="brand-title">
             w
             <svg className="brand-icon" viewBox="0 0 8 24" fill="currentColor" aria-label="i" role="img">
@@ -66,9 +66,6 @@ export default async function HomePage() {
             </svg>
             w
           </h1>
-        </div>
-
-        <div className="landing-center">
           <p>Личный трекер сериалов: что смотрите, что посмотрели, что в планах.</p>
 
           <div className="landing-auth-card">
