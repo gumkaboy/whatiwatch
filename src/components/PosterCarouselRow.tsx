@@ -13,7 +13,6 @@ export function PosterCarouselRow({
   emptyMessage: string;
 }) {
   const trackRef = useRef<HTMLDivElement>(null);
-  const pausedRef = useRef(false);
   const [needsCarousel, setNeedsCarousel] = useState(false);
 
   useEffect(() => {
@@ -38,7 +37,6 @@ export function PosterCarouselRow({
     if (!track) return;
 
     const interval = setInterval(() => {
-      if (pausedRef.current) return;
       track.scrollLeft += 1;
       const half = track.scrollWidth / 2;
       if (track.scrollLeft >= half) {
@@ -60,11 +58,7 @@ export function PosterCarouselRow({
   }
 
   return (
-    <div
-      className="poster-carousel-row"
-      onMouseEnter={() => (pausedRef.current = true)}
-      onMouseLeave={() => (pausedRef.current = false)}
-    >
+    <div className="poster-carousel-row">
       {needsCarousel && (
         <button
           type="button"

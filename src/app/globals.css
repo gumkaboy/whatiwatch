@@ -1485,6 +1485,15 @@ a {
 /* home dashboard */
 
 .home-page {
+  font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
+  width: 100vw;
+  position: relative;
+  left: 50%;
+  right: 50%;
+  margin-left: -50vw;
+  margin-right: -50vw;
+  padding-left: 2cm;
+  padding-right: 2cm;
   display: flex;
   flex-direction: column;
   gap: 2.5rem;
@@ -1496,7 +1505,7 @@ a {
   gap: 0.5rem;
   max-width: 600px;
   width: 100%;
-  margin: 1.5rem 0 0;
+  margin: 1.5rem auto 0;
 }
 
 .home-search input[type="text"] {
@@ -1545,9 +1554,12 @@ a {
   flex: 1;
   min-width: 0;
   display: flex;
+  align-items: center;
   gap: 0.75rem;
   overflow-x: auto;
+  overflow-y: visible;
   scrollbar-width: none;
+  padding: 1rem 0;
 }
 
 .poster-carousel-track::-webkit-scrollbar {
