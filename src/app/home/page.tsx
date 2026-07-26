@@ -31,6 +31,7 @@ export default async function HomeDashboardPage() {
   const continueWatching = tmdbIds
     .map((tmdbId) => seriesByTmdbId.get(tmdbId))
     .filter((s): s is NonNullable<typeof s> => s !== undefined)
+    .filter((s) => s.status !== "COMPLETED" && s.status !== "DROPPED")
     .map((s) => ({ tmdbId: s.tmdbId, name: s.name || "Без названия", posterPath: s.posterPath }));
 
   return (
