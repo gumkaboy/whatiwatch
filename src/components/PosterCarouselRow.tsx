@@ -5,7 +5,13 @@ import { PosterTile } from "@/components/PosterTile";
 
 type Item = { tmdbId: number; name: string; posterPath: string | null };
 
-export function ContinueWatchingRow({ items }: { items: Item[] }) {
+export function PosterCarouselRow({
+  items,
+  emptyMessage,
+}: {
+  items: Item[];
+  emptyMessage: string;
+}) {
   const trackRef = useRef<HTMLDivElement>(null);
   const pausedRef = useRef(false);
   const [needsCarousel, setNeedsCarousel] = useState(false);
@@ -44,7 +50,7 @@ export function ContinueWatchingRow({ items }: { items: Item[] }) {
   }, [needsCarousel]);
 
   if (items.length === 0) {
-    return <p className="empty-state">Пока нечего продолжить — начните смотреть что-то из библиотеки.</p>;
+    return <p className="empty-state">{emptyMessage}</p>;
   }
 
   const displayItems = needsCarousel ? [...items, ...items] : items;
@@ -55,14 +61,14 @@ export function ContinueWatchingRow({ items }: { items: Item[] }) {
 
   return (
     <div
-      className="continue-watching-row"
+      className="poster-carousel-row"
       onMouseEnter={() => (pausedRef.current = true)}
       onMouseLeave={() => (pausedRef.current = false)}
     >
       {needsCarousel && (
         <button
           type="button"
-          className="continue-watching-arrow continue-watching-arrow-left"
+          className="poster-carousel-arrow poster-carousel-arrow-left"
           aria-label="Назад"
           onClick={() => scrollByTiles(-1)}
         >
@@ -71,7 +77,7 @@ export function ContinueWatchingRow({ items }: { items: Item[] }) {
       )}
 
       <div
-        className={`continue-watching-track${needsCarousel ? "" : " continue-watching-track-static"}`}
+        className={`poster-carousel-track${needsCarousel ? "" : " poster-carousel-track-static"}`}
         ref={trackRef}
       >
         {displayItems.map((item, i) => (
@@ -88,7 +94,7 @@ export function ContinueWatchingRow({ items }: { items: Item[] }) {
       {needsCarousel && (
         <button
           type="button"
-          className="continue-watching-arrow continue-watching-arrow-right"
+          className="poster-carousel-arrow poster-carousel-arrow-right"
           aria-label="Вперёд"
           onClick={() => scrollByTiles(1)}
         >

@@ -1,17 +1,21 @@
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth";
-import { ContinueWatchingRow } from "@/components/ContinueWatchingRow";
+import { PosterCarouselRow } from "@/components/PosterCarouselRow";
+import { getPopularSeriesFromTrakt } from "@/lib/trakt";
 
 export default async function HomeDashboardPage() {
   const session = await auth();
   const userId = Number(session!.user.id);
 
-  const lastWatchedBySeries = await prisma.watchedEpisode.groupBy({
-    by: ["tmdbId"],
-    where: { userId },
-    _max: { watchedAt: true },
-    orderBy: { _max: { watchedAt: "desc" } },
-  });
+  const [lastWatchedBySeries, popular] = await Promise.all([
+    prisma.watchedEpisode.groupBy({
+      by: ["tmdbId"],
+      where: { userId },
+      _max: { watchedAt: true },
+      orderBy: { _max: { watchedAt: "desc" } },
+    }),
+    getPopularSeriesFromTrakt(),
+  ]);
 
   const tmdbIds = lastWatchedBySeries.map((row) => row.tmdbId);
 
@@ -39,8 +43,20 @@ export default async function HomeDashboardPage() {
       </form>
 
       <section className="home-section">
-        <h2 className="home-section-title">Продолжить просмотр &gt;</h2>
-        <ContinueWatchingRow items={continueWatching} />
+        <h2 className="home-section-title">
+          Продолжить просмотр <span className="home-section-title-arrow">&gt;</span>
+        </h2>
+        <PosterCarouselRow
+          items={continueWatching}
+          emptyMessage="Пока нечего продолжить — начните смотреть что-то из библиотеки."
+        />
+      </section>
+
+      <section className="home-section">
+        <h2 className="home-section-title">
+          Популярное <span className="home-section-title-arrow">&gt;</span>
+        </h2>
+        <PosterCarouselRow items={popular} emptyMessage="Подборка временно недоступна." />
       </section>
     </div>
   );
