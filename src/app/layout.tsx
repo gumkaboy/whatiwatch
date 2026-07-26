@@ -50,12 +50,7 @@ export default async function RootLayout({
                     </button>
                   </form>
                 </>
-              ) : (
-                <>
-                  <Link href="/login">Вход</Link>
-                  <Link href="/register">Регистрация</Link>
-                </>
-              )}
+              ) : null}
             </div>
           </nav>
         </header>

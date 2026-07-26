@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { auth } from "@/lib/auth";
 import { PosterTile } from "@/components/PosterTile";
+import { AuthButtons } from "@/components/AuthButtons";
 import { CURATED_SERIES } from "@/lib/curatedSeries";
 
 const LANE_COUNT = 7;
@@ -79,12 +80,7 @@ export default async function HomePage() {
             ) : (
               <>
                 <p>Добро пожаловать</p>
-                <div className="landing-auth-buttons">
-                  <Link href="/login">Войти</Link>
-                  <Link href="/register" className="primary">
-                    Зарегистрироваться бесплатно
-                  </Link>
-                </div>
+                <AuthButtons />
               </>
             )}
           </div>

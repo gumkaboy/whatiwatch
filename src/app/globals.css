@@ -1197,24 +1197,96 @@ a {
   justify-content: center;
 }
 
-.landing-auth-buttons a {
+.landing-auth-buttons a,
+.landing-auth-buttons button {
   padding: 0.6rem 1.2rem;
   border-radius: 8px;
   border: 1px solid rgba(128, 128, 128, 0.4);
+  background: transparent;
+  color: inherit;
+  font-size: 1rem;
+  cursor: pointer;
 }
 
-.landing-auth-buttons a:hover {
+.landing-auth-buttons a:hover,
+.landing-auth-buttons button:hover {
   background: rgba(128, 128, 128, 0.12);
 }
 
-.landing-auth-buttons a.primary {
+.landing-auth-buttons a.primary,
+.landing-auth-buttons button.primary {
   background: #7c3aed;
   border-color: transparent;
   color: #fff;
 }
 
-.landing-auth-buttons a.primary:hover {
+.landing-auth-buttons a.primary:hover,
+.landing-auth-buttons button.primary:hover {
   background: #6d28d9;
+}
+
+.auth-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  background: rgba(5, 3, 10, 0.7);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+}
+
+.auth-modal-card {
+  position: relative;
+  width: 100%;
+  max-width: 380px;
+  padding: 2.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 16px;
+  background: rgba(20, 16, 30, 0.92);
+  backdrop-filter: blur(16px) saturate(160%);
+  -webkit-backdrop-filter: blur(16px) saturate(160%);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.55);
+  text-align: center;
+}
+
+.auth-modal-card h2 {
+  margin-bottom: 0.5rem;
+}
+
+.auth-modal-card p {
+  margin-top: 1rem;
+  font-size: 0.9rem;
+}
+
+.auth-modal-close {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  width: 2rem;
+  height: 2rem;
+  border: none;
+  background: none;
+  color: inherit;
+  font-size: 1.5rem;
+  line-height: 1;
+  cursor: pointer;
+  opacity: 0.7;
+}
+
+.auth-modal-close:hover {
+  opacity: 1;
+}
+
+.auth-modal-switch {
+  border: none;
+  background: none;
+  padding: 0;
+  color: #a78bfa;
+  font-size: inherit;
+  cursor: pointer;
+  text-decoration: underline;
 }
 
 @media (max-width: 900px) {
