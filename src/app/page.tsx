@@ -60,10 +60,10 @@ export default async function HomePage() {
 
         <div className="landing-center">
           <h1 className="brand-title">
-            w
+            <span className="brand-w">w</span>
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/free-png.png" alt="i" className="brand-icon" />
-            w
+            <img src="/free-png-cropped.png" alt="i" className="brand-icon" />
+            <span className="brand-w">w</span>
           </h1>
           <p>Личный трекер сериалов: что смотрите, что посмотрели, что в планах.</p>
 
