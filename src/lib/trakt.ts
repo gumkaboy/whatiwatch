@@ -27,6 +27,9 @@ export async function getPopularSeriesFromTrakt(limit = 20) {
       "Content-Type": "application/json",
       "trakt-api-version": "2",
       "trakt-api-key": clientId,
+      // без реального браузерного User-Agent Cloudflare отдаёт 403 на серверные fetch-запросы
+      "User-Agent":
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
     },
     next: { revalidate: 3600 },
   });
