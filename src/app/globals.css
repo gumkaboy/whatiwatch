@@ -1148,26 +1148,38 @@ a {
   z-index: 2;
 }
 
-.landing-center h1 {
+.landing-title {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(96%, 900px);
+  z-index: 2;
+}
+
+.landing-title h1 {
+  margin: 0;
   font-size: clamp(2.5rem, 12vw, 15rem);
   line-height: 1;
+  text-align: center;
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.7);
 }
 
 .brand-title {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 0.03em;
+  gap: 0;
   flex-wrap: wrap;
 }
 
 .brand-icon {
-  width: clamp(4rem, 20vw, 26rem);
+  width: clamp(1.3rem, 6.7vw, 8.7rem);
   height: clamp(4rem, 20vw, 26rem);
+  color: #fff;
   flex-shrink: 0;
 }
 
-.landing-center h1,
 .landing-center p {
   text-shadow: 0 2px 12px rgba(0, 0, 0, 0.7);
 }

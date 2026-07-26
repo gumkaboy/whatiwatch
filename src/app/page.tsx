@@ -57,13 +57,18 @@ export default async function HomePage() {
             );
           })}
 
-        <div className="landing-center">
+        <div className="landing-title">
           <h1 className="brand-title">
             w
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/free-png.png" alt="i" className="brand-icon" />
+            <svg className="brand-icon" viewBox="0 0 8 24" fill="currentColor" aria-label="i" role="img">
+              <path d="M1.3 1h5.4l-1.4 14.5h-2.6z" />
+              <circle cx="4" cy="20" r="2.3" />
+            </svg>
             w
           </h1>
+        </div>
+
+        <div className="landing-center">
           <p>Личный трекер сериалов: что смотрите, что посмотрели, что в планах.</p>
 
           <div className="landing-auth-card">
