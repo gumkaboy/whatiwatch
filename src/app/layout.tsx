@@ -38,6 +38,7 @@ export default async function RootLayout({
           <header className="site-header">
             <nav className="site-nav">
               <div className="site-nav-links">
+                <Link href="/home">Главная</Link>
                 <Link href="/search">Поиск</Link>
                 <Link href="/library">Моя библиотека</Link>
                 <Link href="/profile" className="site-nav-email">
