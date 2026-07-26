@@ -1492,8 +1492,8 @@ a {
   right: 50%;
   margin-left: -50vw;
   margin-right: -50vw;
-  padding-left: 2cm;
-  padding-right: 2cm;
+  padding-left: 1cm;
+  padding-right: 1cm;
   display: flex;
   flex-direction: column;
   gap: 2.5rem;
