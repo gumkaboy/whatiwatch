@@ -13,6 +13,7 @@ export function PosterCarouselRow({
   emptyMessage: string;
 }) {
   const trackRef = useRef<HTMLDivElement>(null);
+  const manualScrollUntilRef = useRef(0);
   const [needsCarousel, setNeedsCarousel] = useState(false);
 
   useEffect(() => {
@@ -37,6 +38,7 @@ export function PosterCarouselRow({
     if (!track) return;
 
     const interval = setInterval(() => {
+      if (Date.now() < manualScrollUntilRef.current) return;
       track.scrollLeft += 1;
       const half = track.scrollWidth / 2;
       if (track.scrollLeft >= half) {
@@ -54,7 +56,26 @@ export function PosterCarouselRow({
   const displayItems = needsCarousel ? [...items, ...items] : items;
 
   function scrollByTiles(direction: 1 | -1) {
-    trackRef.current?.scrollBy({ left: direction * 400, behavior: "smooth" });
+    const track = trackRef.current;
+    if (!track) return;
+
+    const stepMs = 15;
+    const steps = 20;
+    const distance = direction * 400;
+    const perStep = distance / steps;
+    manualScrollUntilRef.current = Date.now() + steps * stepMs + 50;
+
+    let i = 0;
+    const stepInterval = setInterval(() => {
+      i += 1;
+      track.scrollLeft += perStep;
+
+      const half = track.scrollWidth / 2;
+      if (track.scrollLeft >= half) track.scrollLeft -= half;
+      if (track.scrollLeft < 0) track.scrollLeft += half;
+
+      if (i >= steps) clearInterval(stepInterval);
+    }, stepMs);
   }
 
   return (
