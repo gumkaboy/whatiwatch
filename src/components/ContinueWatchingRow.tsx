@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { PosterTile } from "@/components/PosterTile";
 
 type Item = { tmdbId: number; name: string; posterPath: string | null };
@@ -8,10 +8,28 @@ type Item = { tmdbId: number; name: string; posterPath: string | null };
 export function ContinueWatchingRow({ items }: { items: Item[] }) {
   const trackRef = useRef<HTMLDivElement>(null);
   const pausedRef = useRef(false);
+  const [needsCarousel, setNeedsCarousel] = useState(false);
 
   useEffect(() => {
     const track = trackRef.current;
-    if (!track || items.length === 0) return;
+    if (!track) return;
+
+    const checkOverflow = () => {
+      // измеряем ширину одной копии (до дублирования) относительно видимой области
+      const singleWidth = needsCarousel ? track.scrollWidth / 2 : track.scrollWidth;
+      setNeedsCarousel(singleWidth > track.clientWidth + 1);
+    };
+
+    checkOverflow();
+    window.addEventListener("resize", checkOverflow);
+    return () => window.removeEventListener("resize", checkOverflow);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [items.length]);
+
+  useEffect(() => {
+    if (!needsCarousel) return;
+    const track = trackRef.current;
+    if (!track) return;
 
     const interval = setInterval(() => {
       if (pausedRef.current) return;
@@ -23,13 +41,13 @@ export function ContinueWatchingRow({ items }: { items: Item[] }) {
     }, 30);
 
     return () => clearInterval(interval);
-  }, [items.length]);
+  }, [needsCarousel]);
 
   if (items.length === 0) {
     return <p className="empty-state">Пока нечего продолжить — начните смотреть что-то из библиотеки.</p>;
   }
 
-  const doubled = [...items, ...items];
+  const displayItems = needsCarousel ? [...items, ...items] : items;
 
   function scrollByTiles(direction: 1 | -1) {
     trackRef.current?.scrollBy({ left: direction * 400, behavior: "smooth" });
@@ -41,17 +59,22 @@ export function ContinueWatchingRow({ items }: { items: Item[] }) {
       onMouseEnter={() => (pausedRef.current = true)}
       onMouseLeave={() => (pausedRef.current = false)}
     >
-      <button
-        type="button"
-        className="continue-watching-arrow continue-watching-arrow-left"
-        aria-label="Назад"
-        onClick={() => scrollByTiles(-1)}
-      >
-        ‹
-      </button>
+      {needsCarousel && (
+        <button
+          type="button"
+          className="continue-watching-arrow continue-watching-arrow-left"
+          aria-label="Назад"
+          onClick={() => scrollByTiles(-1)}
+        >
+          ‹
+        </button>
+      )}
 
-      <div className="continue-watching-track" ref={trackRef}>
-        {doubled.map((item, i) => (
+      <div
+        className={`continue-watching-track${needsCarousel ? "" : " continue-watching-track-static"}`}
+        ref={trackRef}
+      >
+        {displayItems.map((item, i) => (
           <PosterTile
             key={`${item.tmdbId}-${i}`}
             tmdbId={item.tmdbId}
@@ -62,14 +85,16 @@ export function ContinueWatchingRow({ items }: { items: Item[] }) {
         ))}
       </div>
 
-      <button
-        type="button"
-        className="continue-watching-arrow continue-watching-arrow-right"
-        aria-label="Вперёд"
-        onClick={() => scrollByTiles(1)}
-      >
-        ›
-      </button>
+      {needsCarousel && (
+        <button
+          type="button"
+          className="continue-watching-arrow continue-watching-arrow-right"
+          aria-label="Вперёд"
+          onClick={() => scrollByTiles(1)}
+        >
+          ›
+        </button>
+      )}
     </div>
   );
 }
