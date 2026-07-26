@@ -1173,7 +1173,8 @@ a {
 }
 
 .landing-auth-card {
-  margin-top: 1rem;
+  max-width: 380px;
+  margin: 1rem auto 0;
   padding: 1.5rem;
   border: 1px solid rgba(128, 128, 128, 0.3);
   border-radius: 14px;
