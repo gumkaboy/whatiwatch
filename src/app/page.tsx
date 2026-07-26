@@ -59,10 +59,10 @@ export default async function HomePage() {
 
         <div className="landing-center">
           <h1 className="brand-title">
-            what
+            w
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src="/free-png.png" alt="i" className="brand-icon" />
-            watch
+            w
           </h1>
           <p>Личный трекер сериалов: что смотрите, что посмотрели, что в планах.</p>
 
