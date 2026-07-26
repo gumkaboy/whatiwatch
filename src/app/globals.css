@@ -1572,6 +1572,11 @@ a {
 
 .poster-carousel-track .poster-tile {
   width: 160px;
+  box-shadow: none;
+}
+
+.poster-carousel-track .poster-tile:hover {
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6);
 }
 
 .poster-carousel-arrow {
