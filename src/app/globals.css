@@ -1152,6 +1152,20 @@ a {
   font-size: 2rem;
 }
 
+.brand-title {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.05em;
+}
+
+.brand-lamp {
+  width: 0.6em;
+  height: 0.6em;
+  color: #fff;
+  flex-shrink: 0;
+}
+
 .landing-center h1,
 .landing-center p {
   text-shadow: 0 2px 12px rgba(0, 0, 0, 0.7);

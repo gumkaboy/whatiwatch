@@ -58,7 +58,21 @@ export default async function HomePage() {
           })}
 
         <div className="landing-center">
-          <h1>whatiwatch</h1>
+          <h1 className="brand-title">
+            what
+            <svg
+              className="brand-lamp"
+              viewBox="0 0 24 24"
+              fill="currentColor"
+              aria-label="i"
+              role="img"
+            >
+              <circle cx="12" cy="7" r="5" />
+              <rect x="11" y="12" width="2" height="7" />
+              <ellipse cx="12" cy="20" rx="6" ry="1.5" />
+            </svg>
+            watch
+          </h1>
           <p>Личный трекер сериалов: что смотрите, что посмотрели, что в планах.</p>
 
           <div className="landing-auth-card">
