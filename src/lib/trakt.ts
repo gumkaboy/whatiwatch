@@ -15,14 +15,22 @@ async function getPosterForTmdbId(tmdbId: number) {
   }
 }
 
-export async function getPopularSeriesFromTrakt(limit = 20) {
+export interface PopularSeriesPage {
+  items: { tmdbId: number; name: string; posterPath: string | null; year: string | null }[];
+  hasMore: boolean;
+}
+
+export async function getPopularSeriesFromTrakt(
+  limit = 20,
+  page = 1
+): Promise<PopularSeriesPage> {
   const clientId = process.env.TRAKT_CLIENT_ID;
   if (!clientId) {
     console.warn("[trakt] TRAKT_CLIENT_ID не задан — подборка «Популярное» будет пустой.");
-    return [];
+    return { items: [], hasMore: false };
   }
 
-  const res = await fetch(`https://api.trakt.tv/shows/popular?limit=${limit}`, {
+  const res = await fetch(`https://api.trakt.tv/shows/popular?limit=${limit}&page=${page}`, {
     headers: {
       "Content-Type": "application/json",
       "trakt-api-version": "2",
@@ -36,9 +44,10 @@ export async function getPopularSeriesFromTrakt(limit = 20) {
 
   if (!res.ok) {
     console.warn(`[trakt] shows/popular вернул ${res.status}`);
-    return [];
+    return { items: [], hasMore: false };
   }
 
+  const pageCount = Number(res.headers.get("x-pagination-page-count") ?? "1");
   const shows = (await res.json()) as TraktShowSummary[];
   const entries = shows.filter(
     (s): s is TraktShowSummary & { ids: { tmdb: number } } => s.ids.tmdb !== null
@@ -46,7 +55,7 @@ export async function getPopularSeriesFromTrakt(limit = 20) {
 
   const posters = await Promise.all(entries.map((s) => getPosterForTmdbId(s.ids.tmdb)));
 
-  return entries
+  const items = entries
     .map((s, i) => {
       const poster = posters[i];
       if (!poster) return null;
@@ -58,4 +67,6 @@ export async function getPopularSeriesFromTrakt(limit = 20) {
       };
     })
     .filter((s): s is NonNullable<typeof s> => s !== null);
+
+  return { items, hasMore: page < pageCount };
 }

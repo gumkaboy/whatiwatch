@@ -30,7 +30,7 @@ export default async function HomeDashboardPage() {
   const session = await auth();
   const userId = Number(session!.user.id);
 
-  const [lastWatchedBySeries, popular] = await Promise.all([
+  const [lastWatchedBySeries, popularPage] = await Promise.all([
     prisma.watchedEpisode.groupBy({
       by: ["tmdbId"],
       where: { userId },
@@ -40,6 +40,7 @@ export default async function HomeDashboardPage() {
     }),
     getPopularSeriesFromTrakt(),
   ]);
+  const popular = popularPage.items;
 
   const tmdbIds = lastWatchedBySeries.map((row) => row.tmdbId);
   const watchedCountByTmdbId = new Map(
