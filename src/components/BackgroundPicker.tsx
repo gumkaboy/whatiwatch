@@ -6,16 +6,10 @@ import { setSeriesBackground } from "@/app/actions";
 
 export function BackgroundPicker({
   tmdbId,
-  name,
-  posterPath,
-  year,
   backdrops,
   initialBackgroundPath,
 }: {
   tmdbId: number;
-  name: string;
-  posterPath: string | null;
-  year: string | null;
   backdrops: string[];
   initialBackgroundPath: string | null;
 }) {
@@ -27,7 +21,7 @@ export function BackgroundPicker({
     const prev = selected;
     setSelected(path);
 
-    setSeriesBackground(tmdbId, name, posterPath, year, path).catch(() => {
+    setSeriesBackground(tmdbId, path).catch(() => {
       setSelected(prev);
     });
   }

@@ -242,9 +242,6 @@ export default async function SeriesPage({
 
       <BackgroundPicker
         tmdbId={tmdbId}
-        name={series.name}
-        posterPath={series.poster_path}
-        year={seriesYear}
         backdrops={backdrops.map((b) => b.file_path)}
         initialBackgroundPath={tracking?.backgroundPath ?? null}
       />

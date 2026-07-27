@@ -76,21 +76,16 @@ export async function setRating(
   revalidatePath("/library");
 }
 
-export async function setSeriesBackground(
-  tmdbId: number,
-  name: string,
-  posterPath: string | null,
-  year: string | null,
-  backgroundPath: string | null
-) {
+export async function setSeriesBackground(tmdbId: number, backgroundPath: string | null) {
   const session = await auth();
   if (!session?.user) throw new Error("Не авторизован");
   const userId = Number(session.user.id);
 
-  await prisma.series.upsert({
-    where: { userId_tmdbId: { userId, tmdbId } },
-    update: { backgroundPath },
-    create: { userId, tmdbId, name, posterPath, year, backgroundPath },
+  // фон не должен сам по себе добавлять сериал в библиотеку — обновляем,
+  // только если запись уже существует (создана оценкой/просмотром/сохранением)
+  await prisma.series.updateMany({
+    where: { userId, tmdbId },
+    data: { backgroundPath },
   });
 
   revalidatePath(`/series/${tmdbId}`);
