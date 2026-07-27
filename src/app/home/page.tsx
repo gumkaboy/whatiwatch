@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth";
 import { PosterCarouselRow } from "@/components/PosterCarouselRow";
@@ -84,7 +85,9 @@ export default async function HomeDashboardPage() {
 
       <section className="home-section">
         <h2 className="home-section-title">
-          Продолжить просмотр <span className="home-section-title-arrow">&gt;</span>
+          <Link href="/library?status=WATCHING">
+            Продолжить просмотр <span className="home-section-title-arrow">&gt;</span>
+          </Link>
         </h2>
         <PosterCarouselRow
           items={continueWatching}
@@ -94,7 +97,9 @@ export default async function HomeDashboardPage() {
 
       <section className="home-section">
         <h2 className="home-section-title">
-          Популярное <span className="home-section-title-arrow">&gt;</span>
+          <Link href="/popular">
+            Популярное <span className="home-section-title-arrow">&gt;</span>
+          </Link>
         </h2>
         <PosterCarouselRow items={popular} emptyMessage="Подборка временно недоступна." />
       </section>

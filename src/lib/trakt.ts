@@ -40,15 +40,22 @@ export async function getPopularSeriesFromTrakt(limit = 20) {
   }
 
   const shows = (await res.json()) as TraktShowSummary[];
-  const tmdbIds = shows.map((s) => s.ids.tmdb).filter((id): id is number => id !== null);
+  const entries = shows.filter(
+    (s): s is TraktShowSummary & { ids: { tmdb: number } } => s.ids.tmdb !== null
+  );
 
-  const posters = await Promise.all(tmdbIds.map((tmdbId) => getPosterForTmdbId(tmdbId)));
+  const posters = await Promise.all(entries.map((s) => getPosterForTmdbId(s.ids.tmdb)));
 
-  return tmdbIds
-    .map((tmdbId, i) => {
+  return entries
+    .map((s, i) => {
       const poster = posters[i];
       if (!poster) return null;
-      return { tmdbId, name: poster.name, posterPath: poster.posterPath };
+      return {
+        tmdbId: s.ids.tmdb,
+        name: poster.name,
+        posterPath: poster.posterPath,
+        year: s.year !== null ? String(s.year) : null,
+      };
     })
     .filter((s): s is NonNullable<typeof s> => s !== null);
 }
