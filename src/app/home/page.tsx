@@ -93,6 +93,7 @@ export default async function HomeDashboardPage() {
         <PosterCarouselRow
           items={continueWatching}
           emptyMessage="Пока нечего продолжить — начните смотреть что-то из библиотеки."
+          storageKey="continue-watching"
         />
       </section>
 
@@ -102,7 +103,11 @@ export default async function HomeDashboardPage() {
             Популярное <span className="home-section-title-arrow">&gt;</span>
           </Link>
         </h2>
-        <PosterCarouselRow items={popular} emptyMessage="Подборка временно недоступна." />
+        <PosterCarouselRow
+          items={popular}
+          emptyMessage="Подборка временно недоступна."
+          storageKey="popular"
+        />
       </section>
     </div>
   );

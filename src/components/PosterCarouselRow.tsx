@@ -8,13 +8,17 @@ type Item = { tmdbId: number; name: string; posterPath: string | null };
 export function PosterCarouselRow({
   items,
   emptyMessage,
+  storageKey,
 }: {
   items: Item[];
   emptyMessage: string;
+  storageKey?: string;
 }) {
   const trackRef = useRef<HTMLDivElement>(null);
   const manualScrollUntilRef = useRef(0);
   const [needsCarousel, setNeedsCarousel] = useState(false);
+
+  const sessionKey = storageKey ? `poster-carousel-scroll:${storageKey}` : null;
 
   useEffect(() => {
     const track = trackRef.current;
@@ -32,6 +36,21 @@ export function PosterCarouselRow({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [items.length]);
 
+  // восстанавливаем позицию скролла из прошлого визита на страницу,
+  // чтобы лента не начиналась заново с одних и тех же постеров
+  useEffect(() => {
+    if (!needsCarousel || !sessionKey) return;
+    const track = trackRef.current;
+    if (!track) return;
+
+    const saved = Number(sessionStorage.getItem(sessionKey));
+    if (saved > 0) {
+      const half = track.scrollWidth / 2;
+      track.scrollLeft = saved % half;
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [needsCarousel]);
+
   useEffect(() => {
     if (!needsCarousel) return;
     const track = trackRef.current;
@@ -44,10 +63,11 @@ export function PosterCarouselRow({
       if (track.scrollLeft >= half) {
         track.scrollLeft -= half;
       }
+      if (sessionKey) sessionStorage.setItem(sessionKey, String(track.scrollLeft));
     }, 30);
 
     return () => clearInterval(interval);
-  }, [needsCarousel]);
+  }, [needsCarousel, sessionKey]);
 
   if (items.length === 0) {
     return <p className="empty-state">{emptyMessage}</p>;
