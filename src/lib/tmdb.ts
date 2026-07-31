@@ -79,6 +79,10 @@ export interface PopularSeriesPage {
   hasMore: boolean;
 }
 
+// жанры TMDb, которые не хотим видеть в "Популярном": детское, ток-шоу,
+// новости, реалити, документалистика, мыльные оперы
+const EXCLUDED_GENRE_IDS = [10762, 10767, 10763, 10764, 99, 10766];
+
 // "популярное, но не кринж" — сортировка по популярности с порогом рейтинга
 // и минимальным числом голосов (иначе один сериал с одним голосом 10/10 мог бы попасть в топ)
 export async function getPopularWellRatedSeries(page = 1): Promise<PopularSeriesPage> {
@@ -86,6 +90,7 @@ export async function getPopularWellRatedSeries(page = 1): Promise<PopularSeries
     sort_by: "popularity.desc",
     "vote_average.gte": "7",
     "vote_count.gte": "200",
+    without_genres: EXCLUDED_GENRE_IDS.join(","),
     page: String(page),
   });
 
