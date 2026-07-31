@@ -74,6 +74,31 @@ export function searchSeries(query: string, page = 1) {
   return tmdbFetch<TmdbSeriesSearchResult>("/search/tv", { query, page: String(page) });
 }
 
+export interface PopularSeriesPage {
+  items: { tmdbId: number; name: string; posterPath: string | null; year: string | null }[];
+  hasMore: boolean;
+}
+
+// "популярное, но не кринж" — сортировка по популярности с порогом рейтинга
+// и минимальным числом голосов (иначе один сериал с одним голосом 10/10 мог бы попасть в топ)
+export async function getPopularWellRatedSeries(page = 1): Promise<PopularSeriesPage> {
+  const data = await tmdbFetch<TmdbSeriesSearchResult>("/discover/tv", {
+    sort_by: "popularity.desc",
+    "vote_average.gte": "7",
+    "vote_count.gte": "200",
+    page: String(page),
+  });
+
+  const items = data.results.map((s) => ({
+    tmdbId: s.id,
+    name: s.name,
+    posterPath: s.poster_path,
+    year: s.first_air_date ? s.first_air_date.slice(0, 4) : null,
+  }));
+
+  return { items, hasMore: page < data.total_pages };
+}
+
 export function getSeriesDetails(tmdbId: number) {
   return tmdbFetch<TmdbSeriesDetails>(`/tv/${tmdbId}`);
 }

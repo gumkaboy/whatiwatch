@@ -2,8 +2,7 @@ import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth";
 import { PosterCarouselRow } from "@/components/PosterCarouselRow";
-import { getPopularSeriesFromTrakt } from "@/lib/trakt";
-import { getSeriesDetails, getSeasonEpisodes } from "@/lib/tmdb";
+import { getSeriesDetails, getSeasonEpisodes, getPopularWellRatedSeries } from "@/lib/tmdb";
 
 async function hasUnwatchedAiredEpisodes(tmdbId: number, watchedCount: number) {
   try {
@@ -38,7 +37,7 @@ export default async function HomeDashboardPage() {
       _count: { _all: true },
       orderBy: { _max: { watchedAt: "desc" } },
     }),
-    getPopularSeriesFromTrakt(),
+    getPopularWellRatedSeries(),
   ]);
   const popular = popularPage.items;
 
