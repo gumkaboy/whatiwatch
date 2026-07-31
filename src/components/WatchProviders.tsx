@@ -1,11 +1,23 @@
 import { tmdbImageUrl, type WatchProvider } from "@/lib/tmdb";
 
+// у Кинопоиска реально рабочий прямой поиск (проверено вручную — в топе
+// выдачи сразу нужный тайтл), поэтому для него ведём напрямую туда, а не
+// через промежуточную страницу TMDb
+function buildProviderHref(providerName: string, seriesTitle: string, watchPageUrl: string) {
+  if (/kinopoisk/i.test(providerName)) {
+    return `https://www.kinopoisk.ru/index.php?kp_query=${encodeURIComponent(seriesTitle)}`;
+  }
+  return watchPageUrl;
+}
+
 export function WatchProviders({
   providers,
   watchPageUrl,
+  seriesTitle,
 }: {
   providers: WatchProvider[];
   watchPageUrl: string | null;
+  seriesTitle: string;
 }) {
   if (providers.length === 0 || !watchPageUrl) return null;
 
@@ -19,7 +31,7 @@ export function WatchProviders({
           return (
             <a
               key={p.providerId}
-              href={watchPageUrl}
+              href={buildProviderHref(p.providerName, seriesTitle, watchPageUrl)}
               target="_blank"
               rel="noopener noreferrer"
               className="watch-provider-icon"

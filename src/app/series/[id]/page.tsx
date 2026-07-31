@@ -219,6 +219,7 @@ export default async function SeriesPage({
             <WatchProviders
               providers={watchProvidersResult.providers}
               watchPageUrl={watchProvidersResult.watchPageUrl}
+              seriesTitle={series.name}
             />
 
             <p className="series-overview">{series.overview || "Описание отсутствует."}</p>
