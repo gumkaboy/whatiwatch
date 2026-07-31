@@ -543,6 +543,51 @@ a {
   font-size: 0.8rem;
 }
 
+.watch-providers {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin-top: 0.75rem;
+}
+
+.watch-providers-label {
+  font-size: 0.85rem;
+  color: rgba(180, 180, 190, 0.8);
+  font-weight: 600;
+}
+
+.watch-providers-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.watch-provider-icon {
+  display: block;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 8px;
+  overflow: hidden;
+  transition: transform 0.15s ease;
+}
+
+.watch-provider-icon:hover {
+  transform: scale(1.1);
+}
+
+.watch-provider-icon img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.watch-providers-attribution {
+  font-size: 0.65rem;
+  color: rgba(150, 150, 160, 0.55);
+}
+
 .rating-logo-icon {
   height: 1.2rem;
   width: auto;

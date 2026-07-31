@@ -6,6 +6,7 @@ import {
   getSeriesDetails,
   getSeriesExternalIds,
   getSeriesTrailerKey,
+  getWatchProviders,
   seriesStatusLabel,
   tmdbImageUrl,
   type TmdbEpisode,
@@ -19,6 +20,7 @@ import { StarRating } from "@/components/StarRating";
 import { BackgroundPicker } from "@/components/BackgroundPicker";
 import { SeriesActions } from "@/components/SeriesActions";
 import { CommentSection, type CommentItem } from "@/components/CommentSection";
+import { WatchProviders } from "@/components/WatchProviders";
 
 export default async function SeriesPage({
   params,
@@ -32,7 +34,7 @@ export default async function SeriesPage({
   const session = await auth();
   const userId = Number(session!.user.id);
 
-  const [series, tracking, trailerKey, externalIds, watchedEpisodes, siteRatingAgg, backdrops, comments] =
+  const [series, tracking, trailerKey, externalIds, watchedEpisodes, siteRatingAgg, backdrops, comments, watchProviders] =
     await Promise.all([
       getSeriesDetails(tmdbId).catch(() => null),
       prisma.series.findUnique({ where: { userId_tmdbId: { userId, tmdbId } } }),
@@ -50,6 +52,7 @@ export default async function SeriesPage({
         orderBy: { createdAt: "desc" },
         include: { user: { select: { firstName: true, lastName: true } } },
       }),
+      getWatchProviders(tmdbId).catch(() => []),
     ]);
 
   const siteRating = siteRatingAgg._avg.rating;
@@ -212,6 +215,8 @@ export default async function SeriesPage({
             {series.status && (
               <p className="series-status">{seriesStatusLabel(series.status)}</p>
             )}
+
+            <WatchProviders providers={watchProviders} seriesTitle={series.name} />
 
             <p className="series-overview">{series.overview || "Описание отсутствует."}</p>
           </div>

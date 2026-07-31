@@ -1,6 +1,6 @@
 import type { NextRequest } from "next/server";
 
-const ALLOWED_SIZES = new Set(["w200", "w300", "w342", "w500", "original"]);
+const ALLOWED_SIZES = new Set(["w92", "w200", "w300", "w342", "w500", "original"]);
 const PATH_PATTERN = /^\/[A-Za-z0-9]+\.(jpg|png)$/;
 
 export async function GET(request: NextRequest) {

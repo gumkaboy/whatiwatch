@@ -153,6 +153,57 @@ export async function getSeriesTrailerKey(tmdbId: number): Promise<string | null
   return seriesTrailer?.key ?? null;
 }
 
+export interface WatchProvider {
+  providerId: number;
+  providerName: string;
+  logoPath: string;
+}
+
+interface TmdbWatchProviderRaw {
+  provider_id: number;
+  provider_name: string;
+  logo_path: string;
+}
+
+interface TmdbWatchProvidersResult {
+  results: Record<
+    string,
+    {
+      flatrate?: TmdbWatchProviderRaw[];
+      free?: TmdbWatchProviderRaw[];
+      ads?: TmdbWatchProviderRaw[];
+      rent?: TmdbWatchProviderRaw[];
+      buy?: TmdbWatchProviderRaw[];
+    }
+  >;
+}
+
+export async function getWatchProviders(tmdbId: number): Promise<WatchProvider[]> {
+  const data = await tmdbFetch<TmdbWatchProvidersResult>(`/tv/${tmdbId}/watch/providers`);
+  const ru = data.results?.RU;
+  if (!ru) return [];
+
+  const all = [
+    ...(ru.flatrate ?? []),
+    ...(ru.free ?? []),
+    ...(ru.ads ?? []),
+    ...(ru.rent ?? []),
+    ...(ru.buy ?? []),
+  ];
+
+  const byId = new Map<number, WatchProvider>();
+  for (const p of all) {
+    if (!byId.has(p.provider_id)) {
+      byId.set(p.provider_id, {
+        providerId: p.provider_id,
+        providerName: p.provider_name,
+        logoPath: p.logo_path,
+      });
+    }
+  }
+  return Array.from(byId.values());
+}
+
 export interface TmdbEpisode {
   id: number;
   episode_number: number;
@@ -197,7 +248,7 @@ export async function getSeriesBackdrops(tmdbId: number) {
 
 export function tmdbImageUrl(
   path: string | null,
-  size: "w200" | "w300" | "w342" | "w500" | "original" = "w342"
+  size: "w92" | "w200" | "w300" | "w342" | "w500" | "original" = "w342"
 ) {
   if (!path) return null;
   // грузим через собственный прокси-роут (/api/tmdb-image), а не напрямую с
