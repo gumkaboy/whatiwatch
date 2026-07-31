@@ -34,7 +34,7 @@ export default async function SeriesPage({
   const session = await auth();
   const userId = Number(session!.user.id);
 
-  const [series, tracking, trailerKey, externalIds, watchedEpisodes, siteRatingAgg, backdrops, comments, watchProviders] =
+  const [series, tracking, trailerKey, externalIds, watchedEpisodes, siteRatingAgg, backdrops, comments, watchProvidersResult] =
     await Promise.all([
       getSeriesDetails(tmdbId).catch(() => null),
       prisma.series.findUnique({ where: { userId_tmdbId: { userId, tmdbId } } }),
@@ -52,7 +52,7 @@ export default async function SeriesPage({
         orderBy: { createdAt: "desc" },
         include: { user: { select: { firstName: true, lastName: true } } },
       }),
-      getWatchProviders(tmdbId).catch(() => []),
+      getWatchProviders(tmdbId).catch(() => ({ providers: [], watchPageUrl: null })),
     ]);
 
   const siteRating = siteRatingAgg._avg.rating;
@@ -216,7 +216,10 @@ export default async function SeriesPage({
               <p className="series-status">{seriesStatusLabel(series.status)}</p>
             )}
 
-            <WatchProviders providers={watchProviders} seriesTitle={series.name} />
+            <WatchProviders
+              providers={watchProvidersResult.providers}
+              watchPageUrl={watchProvidersResult.watchPageUrl}
+            />
 
             <p className="series-overview">{series.overview || "Описание отсутствует."}</p>
           </div>

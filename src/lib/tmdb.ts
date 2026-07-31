@@ -178,10 +178,17 @@ interface TmdbWatchProvidersResult {
   >;
 }
 
-export async function getWatchProviders(tmdbId: number): Promise<WatchProvider[]> {
-  const data = await tmdbFetch<TmdbWatchProvidersResult>(`/tv/${tmdbId}/watch/providers`);
+export interface WatchProvidersResult {
+  providers: WatchProvider[];
+  watchPageUrl: string | null;
+}
+
+export async function getWatchProviders(tmdbId: number): Promise<WatchProvidersResult> {
+  const data = await tmdbFetch<TmdbWatchProvidersResult & { results: Record<string, { link?: string }> }>(
+    `/tv/${tmdbId}/watch/providers`
+  );
   const ru = data.results?.RU;
-  if (!ru) return [];
+  if (!ru) return { providers: [], watchPageUrl: null };
 
   const all = [
     ...(ru.flatrate ?? []),
@@ -201,7 +208,7 @@ export async function getWatchProviders(tmdbId: number): Promise<WatchProvider[]
       });
     }
   }
-  return Array.from(byId.values());
+  return { providers: Array.from(byId.values()), watchPageUrl: ru.link ?? null };
 }
 
 export interface TmdbEpisode {

@@ -1,14 +1,13 @@
 import { tmdbImageUrl, type WatchProvider } from "@/lib/tmdb";
-import { buildWatchProviderUrl } from "@/lib/watchProviderLinks";
 
 export function WatchProviders({
   providers,
-  seriesTitle,
+  watchPageUrl,
 }: {
   providers: WatchProvider[];
-  seriesTitle: string;
+  watchPageUrl: string | null;
 }) {
-  if (providers.length === 0) return null;
+  if (providers.length === 0 || !watchPageUrl) return null;
 
   return (
     <div className="watch-providers">
@@ -20,7 +19,7 @@ export function WatchProviders({
           return (
             <a
               key={p.providerId}
-              href={buildWatchProviderUrl(p.providerName, seriesTitle)}
+              href={watchPageUrl}
               target="_blank"
               rel="noopener noreferrer"
               className="watch-provider-icon"
