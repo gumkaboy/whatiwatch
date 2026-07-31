@@ -219,7 +219,7 @@ export default async function SeriesPage({
             <WatchProviders
               providers={watchProvidersResult.providers}
               watchPageUrl={watchProvidersResult.watchPageUrl}
-              seriesTitle={series.name}
+              kinopoiskId={kinopoiskRating?.kinopoiskId ?? null}
             />
 
             <p className="series-overview">{series.overview || "Описание отсутствует."}</p>

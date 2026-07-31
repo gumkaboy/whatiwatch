@@ -1,11 +1,10 @@
 import { tmdbImageUrl, type WatchProvider } from "@/lib/tmdb";
 
-// у Кинопоиска реально рабочий прямой поиск (проверено вручную — в топе
-// выдачи сразу нужный тайтл), поэтому для него ведём напрямую туда, а не
-// через промежуточную страницу TMDb
-function buildProviderHref(providerName: string, seriesTitle: string, watchPageUrl: string) {
-  if (/kinopoisk/i.test(providerName)) {
-    return `https://www.kinopoisk.ru/index.php?kp_query=${encodeURIComponent(seriesTitle)}`;
+function buildProviderHref(providerName: string, watchPageUrl: string, kinopoiskId: number | null) {
+  // для Кинопоиска у нас есть точный ID (сверен по IMDb ID через их API),
+  // поэтому ведём сразу на карточку тайтла, а не на промежуточную страницу TMDb
+  if (kinopoiskId !== null && /kinopoisk/i.test(providerName)) {
+    return `https://www.kinopoisk.ru/film/${kinopoiskId}/`;
   }
   return watchPageUrl;
 }
@@ -13,11 +12,11 @@ function buildProviderHref(providerName: string, seriesTitle: string, watchPageU
 export function WatchProviders({
   providers,
   watchPageUrl,
-  seriesTitle,
+  kinopoiskId,
 }: {
   providers: WatchProvider[];
   watchPageUrl: string | null;
-  seriesTitle: string;
+  kinopoiskId: number | null;
 }) {
   if (providers.length === 0 || !watchPageUrl) return null;
 
@@ -31,7 +30,7 @@ export function WatchProviders({
           return (
             <a
               key={p.providerId}
-              href={buildProviderHref(p.providerName, seriesTitle, watchPageUrl)}
+              href={buildProviderHref(p.providerName, watchPageUrl, kinopoiskId)}
               target="_blank"
               rel="noopener noreferrer"
               className="watch-provider-icon"
