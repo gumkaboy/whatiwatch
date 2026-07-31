@@ -1,31 +1,45 @@
-const PROVIDER_LINKS: { match: RegExp; url: (title: string) => string }[] = [
-  { match: /netflix/i, url: (t) => `https://www.netflix.com/search?q=${enc(t)}` },
-  { match: /amazon (prime video|video)/i, url: (t) => `https://www.amazon.com/gp/video/search?phrase=${enc(t)}` },
-  { match: /apple tv/i, url: (t) => `https://tv.apple.com/search?term=${enc(t)}` },
-  { match: /hbo max|^max$/i, url: (t) => `https://www.max.com/search?q=${enc(t)}` },
-  { match: /hulu/i, url: (t) => `https://www.hulu.com/search?q=${enc(t)}` },
-  { match: /disney/i, url: (t) => `https://www.disneyplus.com/search?q=${enc(t)}` },
-  { match: /peacock/i, url: (t) => `https://www.peacocktv.com/search?q=${enc(t)}` },
-  { match: /google play/i, url: (t) => `https://play.google.com/store/search?q=${enc(t)}&c=movies` },
-  { match: /youtube/i, url: (t) => `https://www.youtube.com/results?search_query=${enc(t)}` },
-  { match: /okko/i, url: (t) => `https://okko.tv/search?query=${enc(t)}` },
-  { match: /amediateka/i, url: (t) => `https://amediateka.ru/search?query=${enc(t)}` },
-  { match: /kinopoisk/i, url: (t) => `https://www.kinopoisk.ru/index.php?kp_query=${enc(t)}` },
-  { match: /\bivi\b/i, url: (t) => `https://www.ivi.ru/search?q=${enc(t)}` },
-  { match: /wink/i, url: (t) => `https://wink.rt.ru/search/?query=${enc(t)}` },
-  { match: /\bstart\b/i, url: (t) => `https://start.ru/search?query=${enc(t)}` },
-  { match: /megogo/i, url: (t) => `https://megogo.net/ru/search?query=${enc(t)}` },
-  { match: /more\.?\s?tv/i, url: (t) => `https://more.tv/search?query=${enc(t)}` },
-  { match: /tvigle/i, url: (t) => `https://tvigle.ru/search/?text=${enc(t)}` },
-  { match: /fandango/i, url: (t) => `https://www.fandangoathome.com/search/${enc(t)}` },
-];
-
 function enc(value: string) {
   return encodeURIComponent(value);
 }
 
+// проверенные, реально рабочие поисковые URL самих сервисов
+const VERIFIED_SEARCH_LINKS: { match: RegExp; url: (title: string) => string }[] = [
+  { match: /netflix/i, url: (t) => `https://www.netflix.com/search?q=${enc(t)}` },
+  { match: /youtube/i, url: (t) => `https://www.youtube.com/results?search_query=${enc(t)}` },
+  { match: /google play/i, url: (t) => `https://play.google.com/store/search?q=${enc(t)}&c=movies` },
+];
+
+// остальные сервисы — у их внутреннего поиска непредсказуемый формат (проверено
+// на Okko: угаданный /search?query= ничего не находит даже для существующих
+// в их каталоге тайтлов), поэтому используем поиск Google с ограничением по
+// домену сервиса — работает независимо от того, как устроен поиск на сайте
+const PROVIDER_DOMAINS: { match: RegExp; domain: string }[] = [
+  { match: /amazon (prime video|video)/i, domain: "amazon.com" },
+  { match: /apple tv/i, domain: "tv.apple.com" },
+  { match: /hbo max|^max$/i, domain: "max.com" },
+  { match: /hulu/i, domain: "hulu.com" },
+  { match: /disney/i, domain: "disneyplus.com" },
+  { match: /peacock/i, domain: "peacocktv.com" },
+  { match: /okko/i, domain: "okko.tv" },
+  { match: /amediateka/i, domain: "amediateka.ru" },
+  { match: /kinopoisk/i, domain: "kinopoisk.ru" },
+  { match: /\bivi\b/i, domain: "ivi.ru" },
+  { match: /wink/i, domain: "wink.rt.ru" },
+  { match: /\bstart\b/i, domain: "start.ru" },
+  { match: /megogo/i, domain: "megogo.net" },
+  { match: /more\.?\s?tv/i, domain: "more.tv" },
+  { match: /tvigle/i, domain: "tvigle.ru" },
+  { match: /fandango/i, domain: "fandangoathome.com" },
+];
+
 export function buildWatchProviderUrl(providerName: string, seriesTitle: string) {
-  const found = PROVIDER_LINKS.find((p) => p.match.test(providerName));
-  if (found) return found.url(seriesTitle);
+  const verified = VERIFIED_SEARCH_LINKS.find((p) => p.match.test(providerName));
+  if (verified) return verified.url(seriesTitle);
+
+  const domain = PROVIDER_DOMAINS.find((p) => p.match.test(providerName));
+  if (domain) {
+    return `https://www.google.com/search?q=${enc(`site:${domain.domain} ${seriesTitle}`)}`;
+  }
+
   return `https://www.google.com/search?q=${enc(`смотреть ${providerName} ${seriesTitle}`)}`;
 }
