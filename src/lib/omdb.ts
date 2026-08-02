@@ -19,7 +19,7 @@ export async function getImdbRating(imdbId: string): Promise<ImdbRating | null> 
   url.searchParams.set("apikey", apiKey);
   url.searchParams.set("i", imdbId);
 
-  const res = await fetch(url, { cache: "no-store" });
+  const res = await fetch(url, { next: { revalidate: 3600 } });
   if (!res.ok) return null;
 
   const data = (await res.json()) as OmdbResponse;

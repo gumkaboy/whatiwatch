@@ -33,22 +33,21 @@ export async function getKinopoiskRating(
   const searchUrl = new URL(`${BASE_URL}/api/v2.1/films/search-by-keyword`);
   searchUrl.searchParams.set("keyword", title);
 
-  const searchRes = await fetch(searchUrl, { headers: getHeaders(apiKey), cache: "no-store" });
+  const searchRes = await fetch(searchUrl, { headers: getHeaders(apiKey), next: { revalidate: 3600 } });
   if (!searchRes.ok) return null;
   const searchData = (await searchRes.json()) as KpSearchResult;
 
-  for (const candidate of searchData.films.slice(0, 5)) {
-    const detailsRes = await fetch(`${BASE_URL}/api/v2.2/films/${candidate.filmId}`, {
-      headers: getHeaders(apiKey),
-      cache: "no-store",
-    });
-    if (!detailsRes.ok) continue;
-    const details = (await detailsRes.json()) as KpFilmDetails;
+  const candidates = await Promise.all(
+    searchData.films.slice(0, 5).map(async (candidate) => {
+      const detailsRes = await fetch(`${BASE_URL}/api/v2.2/films/${candidate.filmId}`, {
+        headers: getHeaders(apiKey),
+        next: { revalidate: 3600 },
+      });
+      if (!detailsRes.ok) return null;
+      return (await detailsRes.json()) as KpFilmDetails;
+    })
+  );
 
-    if (details.imdbId === imdbId && details.ratingKinopoisk != null) {
-      return { rating: details.ratingKinopoisk, kinopoiskId: details.kinopoiskId };
-    }
-  }
-
-  return null;
+  const match = candidates.find((d) => d?.imdbId === imdbId && d.ratingKinopoisk != null);
+  return match ? { rating: match.ratingKinopoisk!, kinopoiskId: match.kinopoiskId } : null;
 }

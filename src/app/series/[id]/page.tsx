@@ -34,26 +34,49 @@ export default async function SeriesPage({
   const session = await auth();
   const userId = Number(session!.user.id);
 
-  const [series, tracking, trailerKey, externalIds, watchedEpisodes, siteRatingAgg, backdrops, comments, watchProvidersResult] =
-    await Promise.all([
-      getSeriesDetails(tmdbId).catch(() => null),
-      prisma.series.findUnique({ where: { userId_tmdbId: { userId, tmdbId } } }),
-      getSeriesTrailerKey(tmdbId).catch(() => null),
-      getSeriesExternalIds(tmdbId).catch(() => null),
-      prisma.watchedEpisode.findMany({ where: { userId, tmdbId } }),
-      prisma.series.aggregate({
-        where: { tmdbId, rating: { not: null } },
-        _avg: { rating: true },
-        _count: { rating: true },
-      }),
-      getSeriesBackdrops(tmdbId).catch(() => []),
-      prisma.comment.findMany({
-        where: { tmdbId },
-        orderBy: { createdAt: "desc" },
-        include: { user: { select: { firstName: true, lastName: true } } },
-      }),
-      getWatchProviders(tmdbId).catch(() => ({ providers: [], watchPageUrl: null })),
-    ]);
+  const seriesPromise = getSeriesDetails(tmdbId).catch(() => null);
+
+  // серии по сезонам зависят только от количества сезонов (уже известно из
+  // getSeriesDetails), поэтому запускаем сразу, как только сериал получен,
+  // а не ждём ещё и трейлер/бэкдропы/провайдеров — это чисто искусственная
+  // задержка, ничем не оправданная зависимостью данных
+  const episodesArraysPromise = seriesPromise.then((series) => {
+    if (!series) return [];
+    const seasonNumbers = series.seasons.map((s) => s.season_number).filter((n) => n > 0);
+    return Promise.all(seasonNumbers.map((n) => getSeasonEpisodes(tmdbId, n).catch(() => [])));
+  });
+
+  const [
+    series,
+    tracking,
+    trailerKey,
+    externalIds,
+    watchedEpisodes,
+    siteRatingAgg,
+    backdrops,
+    comments,
+    watchProvidersResult,
+    episodesArrays,
+  ] = await Promise.all([
+    seriesPromise,
+    prisma.series.findUnique({ where: { userId_tmdbId: { userId, tmdbId } } }),
+    getSeriesTrailerKey(tmdbId).catch(() => null),
+    getSeriesExternalIds(tmdbId).catch(() => null),
+    prisma.watchedEpisode.findMany({ where: { userId, tmdbId } }),
+    prisma.series.aggregate({
+      where: { tmdbId, rating: { not: null } },
+      _avg: { rating: true },
+      _count: { rating: true },
+    }),
+    getSeriesBackdrops(tmdbId).catch(() => []),
+    prisma.comment.findMany({
+      where: { tmdbId },
+      orderBy: { createdAt: "desc" },
+      include: { user: { select: { firstName: true, lastName: true } } },
+    }),
+    getWatchProviders(tmdbId).catch(() => ({ providers: [], watchPageUrl: null })),
+    episodesArraysPromise,
+  ]);
 
   const siteRating = siteRatingAgg._avg.rating;
   const siteRatingCount = siteRatingAgg._count.rating;
@@ -81,14 +104,13 @@ export default async function SeriesPage({
     .map((s) => s.season_number)
     .filter((n) => n > 0);
 
-  const [imdbRating, kinopoiskRating, episodesArrays] = await Promise.all([
+  const [imdbRating, kinopoiskRating] = await Promise.all([
     externalIds?.imdb_id
       ? getImdbRating(externalIds.imdb_id).catch(() => null)
       : Promise.resolve(null),
     externalIds?.imdb_id
       ? getKinopoiskRating(series.name, externalIds.imdb_id).catch(() => null)
       : Promise.resolve(null),
-    Promise.all(trackableSeasonNumbers.map((n) => getSeasonEpisodes(tmdbId, n).catch(() => []))),
   ]);
 
   const episodesBySeasonNumber: Record<number, TmdbEpisode[]> = {};

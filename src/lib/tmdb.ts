@@ -22,7 +22,9 @@ async function tmdbFetch<T>(path: string, params?: Record<string, string>): Prom
     }
   }
 
-  const res = await fetch(url, { headers: getAuthHeaders(), cache: "no-store" });
+  // данные TMDb (описания, даты выхода, постеры) не меняются поминутно —
+  // короткий общий кэш вместо no-store резко сокращает задержку страниц
+  const res = await fetch(url, { headers: getAuthHeaders(), next: { revalidate: 300 } });
   if (!res.ok) {
     throw new Error(`TMDb API error ${res.status}: ${await res.text()}`);
   }
