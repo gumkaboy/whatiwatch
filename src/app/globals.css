@@ -91,30 +91,43 @@ a {
 
 .site-nav-links {
   display: flex;
-  gap: 1.25rem;
-}
-
-.site-nav-links {
   align-items: center;
+  gap: 0.2rem;
+  padding: 0.35rem;
+  border-radius: 999px;
 }
 
-.site-nav-links a:hover {
-  text-decoration: underline;
+.site-nav-links a,
+.site-nav-signout {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  padding: 0.55rem 1.1rem;
+  border-radius: 999px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.92);
+  text-decoration: none;
+  transition: background-color 0.2s ease, transform 0.15s ease;
+}
+
+.site-nav-links a:hover,
+.site-nav-signout:hover {
+  background: rgba(255, 255, 255, 0.16);
+  transform: translateY(-1px);
+  text-decoration: none;
 }
 
 .site-nav-email {
-  color: rgba(128, 128, 128, 0.9);
-  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.75) !important;
+  font-weight: 500 !important;
 }
 
 .site-nav-signout {
   background: none;
   border: none;
-  color: inherit;
   cursor: pointer;
-  font-size: inherit;
-  padding: 0;
-  text-decoration: underline;
+  font-size: 0.9rem;
 }
 
 .site-main {
@@ -1522,33 +1535,36 @@ a {
 .library-stat-circle,
 .series-action-btn,
 .season-tab,
-.comment-item {
+.comment-item,
+.site-nav-links {
   position: relative;
   background: linear-gradient(
     155deg,
-    rgba(255, 255, 255, 0.16) 0%,
-    rgba(255, 255, 255, 0.03) 55%,
-    rgba(255, 255, 255, 0.09) 100%
+    rgba(255, 255, 255, 0.2) 0%,
+    rgba(255, 255, 255, 0.04) 55%,
+    rgba(255, 255, 255, 0.12) 100%
   );
-  backdrop-filter: blur(14px) saturate(180%);
-  -webkit-backdrop-filter: blur(14px) saturate(180%);
-  border: 1px solid rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(22px) saturate(220%);
+  -webkit-backdrop-filter: blur(22px) saturate(220%);
+  border: 1px solid rgba(255, 255, 255, 0.3);
   box-shadow:
     0 8px 24px rgba(0, 0, 0, 0.35),
-    inset 0 1px 1px rgba(255, 255, 255, 0.45),
-    inset 0 -14px 20px -16px rgba(255, 255, 255, 0.12);
+    0 1.5px 3px rgba(0, 0, 0, 0.2),
+    inset 0 1px 1px rgba(255, 255, 255, 0.55),
+    inset 0 -14px 20px -16px rgba(255, 255, 255, 0.16);
   overflow: hidden;
 }
 
 .library-stat-circle::before,
 .series-action-btn::before,
 .season-tab::before,
-.comment-item::before {
+.comment-item::before,
+.site-nav-links::before {
   content: "";
   position: absolute;
   inset: 0;
   border-radius: inherit;
-  background: radial-gradient(120% 90% at 25% -10%, rgba(255, 255, 255, 0.35), transparent 60%);
+  background: radial-gradient(120% 90% at 25% -10%, rgba(255, 255, 255, 0.45), transparent 60%);
   pointer-events: none;
 }
 
