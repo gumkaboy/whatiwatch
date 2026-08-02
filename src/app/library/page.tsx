@@ -18,7 +18,7 @@ export default async function LibraryPage({
   searchParams: Promise<{ status?: string }>;
 }) {
   const { status } = await searchParams;
-  const activeFilter = (status as WatchStatus | undefined) ?? "ALL";
+  const activeFilter = (status as WatchStatus | "ALL" | undefined) ?? "WATCHING";
 
   const session = await auth();
   const userId = Number(session!.user.id);
@@ -58,7 +58,7 @@ export default async function LibraryPage({
         {FILTERS.map((f) => (
           <Link
             key={f.value}
-            href={f.value === "ALL" ? "/library" : `/library?status=${f.value}`}
+            href={`/library?status=${f.value}`}
             className="library-filter"
             data-active={activeFilter === f.value}
           >
