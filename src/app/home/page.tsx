@@ -4,6 +4,10 @@ import { auth } from "@/lib/auth";
 import { PosterCarouselRow } from "@/components/PosterCarouselRow";
 import { getSeriesDetails, getSeasonEpisodes, getPopularWellRatedSeries } from "@/lib/tmdb";
 
+// см. пояснение в src/app/series/[id]/page.tsx — без этого fetch к TMDb
+// после auth()/cookies() не кэшируется вообще, несмотря на next.revalidate
+export const fetchCache = "default-cache";
+
 async function hasUnwatchedAiredEpisodes(tmdbId: number, watchedCount: number) {
   try {
     const series = await getSeriesDetails(tmdbId);

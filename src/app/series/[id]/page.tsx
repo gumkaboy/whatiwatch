@@ -22,6 +22,12 @@ import { SeriesActions } from "@/components/SeriesActions";
 import { CommentSection, type CommentItem } from "@/components/CommentSection";
 import { WatchProviders } from "@/components/WatchProviders";
 
+// auth() ниже читает cookies() до внешних fetch к TMDb/OMDb/Кинопоиску —
+// по умолчанию Next.js вообще не кэширует fetch, обнаруженные ПОСЛЕ
+// Request-time API, даже если у fetch указан next.revalidate. Без этой
+// настройки кэш из tmdbFetch/omdb/kinopoisk молча игнорировался.
+export const fetchCache = "default-cache";
+
 export default async function SeriesPage({
   params,
 }: {

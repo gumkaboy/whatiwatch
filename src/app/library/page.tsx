@@ -6,6 +6,10 @@ import { LibraryStats } from "@/components/LibraryStats";
 import { WatchStatus } from "@/generated/prisma/client";
 import { getAiredEpisodeCount } from "@/lib/tmdb";
 
+// см. пояснение в src/app/series/[id]/page.tsx — без этого fetch к TMDb
+// после auth()/cookies() не кэшируется вообще, несмотря на next.revalidate
+export const fetchCache = "default-cache";
+
 const FILTERS: { value: WatchStatus | "ALL"; label: string }[] = [
   { value: "ALL", label: "Все" },
   { value: "WATCHING", label: "Смотрю" },
