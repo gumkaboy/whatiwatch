@@ -50,13 +50,16 @@ export default async function LibraryPage({
 
   const watchedCountByTmdbId = new Map(watchedByTmdbId.map((row) => [row.tmdbId, row._count._all]));
 
-  // локальный прототип для оценки вёрстки — прогресс-бар/бейдж пока
-  // считаются "на лету" через TMDb, для продакшна на большую библиотеку
-  // это нужно будет кэшировать в БД, а не дёргать TMDb на каждый рендер
+  // прогресс (бейдж + полоса) считаем только для сериалов "Смотрю" — для
+  // "Просмотрено"/"Хочу посмотреть" это не нужно, а сериалов в статусе
+  // "Смотрю" обычно на порядок меньше, чем во всей библиотеке
+  const watchingEntries = entries.filter((e) => e.status === "WATCHING");
   const airedCounts = await Promise.all(
-    entries.map((entry) => getAiredEpisodeCount(entry.tmdbId).catch(() => null))
+    watchingEntries.map((entry) => getAiredEpisodeCount(entry.tmdbId).catch(() => null))
   );
-  const airedCountByTmdbId = new Map(entries.map((entry, i) => [entry.tmdbId, airedCounts[i]]));
+  const airedCountByTmdbId = new Map(
+    watchingEntries.map((entry, i) => [entry.tmdbId, airedCounts[i]])
+  );
 
   const episodesCount = watchedAgg._count._all;
   const totalMinutes = watchedAgg._sum.runtime ?? 0;
