@@ -4,6 +4,7 @@ import { auth } from "@/lib/auth";
 import { SeriesCard } from "@/components/SeriesCard";
 import { LibraryStats } from "@/components/LibraryStats";
 import { WatchStatus } from "@/generated/prisma/client";
+import { getAiredEpisodeCount } from "@/lib/tmdb";
 
 const FILTERS: { value: WatchStatus | "ALL"; label: string }[] = [
   { value: "ALL", label: "Все" },
@@ -23,7 +24,7 @@ export default async function LibraryPage({
   const session = await auth();
   const userId = Number(session!.user.id);
 
-  const [entries, watchedAgg, seriesInProgressCount] = await Promise.all([
+  const [entries, watchedAgg, seriesInProgressCount, watchedByTmdbId] = await Promise.all([
     prisma.series.findMany({
       where: activeFilter === "ALL" ? { userId } : { userId, status: activeFilter },
       orderBy: { updatedAt: "desc" },
@@ -36,7 +37,22 @@ export default async function LibraryPage({
     prisma.series.count({
       where: { userId, status: { in: ["WATCHING", "COMPLETED"] } },
     }),
+    prisma.watchedEpisode.groupBy({
+      by: ["tmdbId"],
+      where: { userId },
+      _count: { _all: true },
+    }),
   ]);
+
+  const watchedCountByTmdbId = new Map(watchedByTmdbId.map((row) => [row.tmdbId, row._count._all]));
+
+  // локальный прототип для оценки вёрстки — прогресс-бар/бейдж пока
+  // считаются "на лету" через TMDb, для продакшна на большую библиотеку
+  // это нужно будет кэшировать в БД, а не дёргать TMDb на каждый рендер
+  const airedCounts = await Promise.all(
+    entries.map((entry) => getAiredEpisodeCount(entry.tmdbId).catch(() => null))
+  );
+  const airedCountByTmdbId = new Map(entries.map((entry, i) => [entry.tmdbId, airedCounts[i]]));
 
   const episodesCount = watchedAgg._count._all;
   const totalMinutes = watchedAgg._sum.runtime ?? 0;
@@ -81,6 +97,8 @@ export default async function LibraryPage({
               posterPath={entry.posterPath}
               year={entry.year}
               status={entry.status}
+              watchedCount={watchedCountByTmdbId.get(entry.tmdbId) ?? 0}
+              totalEpisodes={airedCountByTmdbId.get(entry.tmdbId) ?? undefined}
             />
           ))}
         </div>

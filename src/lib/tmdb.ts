@@ -232,6 +232,20 @@ export async function getSeasonEpisodes(tmdbId: number, seasonNumber: number) {
   return data.episodes;
 }
 
+export async function getAiredEpisodeCount(tmdbId: number): Promise<number> {
+  const series = await getSeriesDetails(tmdbId);
+  const seasonNumbers = series.seasons.map((s) => s.season_number).filter((n) => n > 0);
+  const now = new Date();
+
+  const episodesArrays = await Promise.all(
+    seasonNumbers.map((n) => getSeasonEpisodes(tmdbId, n).catch(() => []))
+  );
+
+  return episodesArrays
+    .flat()
+    .filter((ep) => ep.air_date && new Date(ep.air_date) <= now).length;
+}
+
 interface TmdbExternalIds {
   imdb_id: string | null;
 }
