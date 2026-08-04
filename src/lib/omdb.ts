@@ -3,12 +3,10 @@ const OMDB_BASE_URL = "https://www.omdbapi.com/";
 interface OmdbResponse {
   Response: "True" | "False";
   imdbRating?: string;
-  imdbVotes?: string;
 }
 
 export interface ImdbRating {
   rating: number;
-  votes: string;
 }
 
 export async function getImdbRating(imdbId: string): Promise<ImdbRating | null> {
@@ -27,8 +25,5 @@ export async function getImdbRating(imdbId: string): Promise<ImdbRating | null> 
     return null;
   }
 
-  return {
-    rating: Number(data.imdbRating),
-    votes: data.imdbVotes ?? "0",
-  };
+  return { rating: Number(data.imdbRating) };
 }

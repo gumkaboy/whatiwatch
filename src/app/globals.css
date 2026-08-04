@@ -157,8 +157,7 @@ a {
   font-size: 1rem;
 }
 
-.search-form button,
-.tracking-form button {
+.search-form button {
   padding: 0.6rem 1rem;
   border: 1px solid rgba(128, 128, 128, 0.4);
   border-radius: 6px;
@@ -168,8 +167,7 @@ a {
   font-size: 1rem;
 }
 
-.search-form button:hover,
-.tracking-form button:hover {
+.search-form button:hover {
   background: rgba(128, 128, 128, 0.12);
 }
 
@@ -936,22 +934,6 @@ a {
   right: 0;
 }
 
-.tracking-form {
-  margin-top: 1.5rem;
-  padding: 1rem;
-  border: 1px solid rgba(128, 128, 128, 0.3);
-  border-radius: 10px;
-  display: grid;
-  gap: 0.9rem;
-  max-width: 700px;
-}
-
-.tracking-form-row {
-  display: flex;
-  gap: 1rem;
-  flex-wrap: wrap;
-}
-
 .field {
   display: flex;
   flex-direction: column;
@@ -970,12 +952,6 @@ a {
   border-radius: 6px;
   background: transparent;
   color: inherit;
-}
-
-.form-actions {
-  display: flex;
-  gap: 0.75rem;
-  align-items: center;
 }
 
 /* library stats */

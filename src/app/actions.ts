@@ -4,6 +4,13 @@ import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { auth, signOut } from "@/lib/auth";
 import { getSeasonEpisodes, getSeriesDetails } from "@/lib/tmdb";
+import type { WatchStatus } from "@/generated/prisma/client";
+
+function computeWatchStatus(watchedCount: number, totalEpisodes: number): WatchStatus {
+  if (watchedCount === 0) return "PLANNED";
+  if (totalEpisodes > 0 && watchedCount >= totalEpisodes) return "COMPLETED";
+  return "WATCHING";
+}
 
 export async function signOutAction() {
   await signOut({ redirectTo: "/" });
@@ -38,12 +45,7 @@ export async function toggleEpisodeWatched(
   }
 
   const watchedCount = await prisma.watchedEpisode.count({ where: { userId, tmdbId } });
-  const status =
-    watchedCount === 0
-      ? "PLANNED"
-      : episodeCount > 0 && watchedCount >= episodeCount
-        ? "COMPLETED"
-        : "WATCHING";
+  const status = computeWatchStatus(watchedCount, episodeCount);
 
   await prisma.series.upsert({
     where: { userId_tmdbId: { userId, tmdbId } },
@@ -167,12 +169,7 @@ export async function markAllAiredWatched(tmdbId: number) {
   }
 
   const watchedCount = await prisma.watchedEpisode.count({ where: { userId, tmdbId } });
-  const status =
-    watchedCount === 0
-      ? "PLANNED"
-      : airedEpisodes.length > 0 && watchedCount >= airedEpisodes.length
-        ? "COMPLETED"
-        : "WATCHING";
+  const status = computeWatchStatus(watchedCount, airedEpisodes.length);
   const name = series.name;
   const posterPath = series.poster_path;
   const year = series.first_air_date?.slice(0, 4) ?? null;

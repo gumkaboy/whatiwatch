@@ -1,6 +1,6 @@
 // Подобранный вручную список сериалов для конвейера постеров на главной странице
 // (вместо TMDb /tv/popular, который выдавал случайную и малоизвестную подборку).
-export interface CuratedSeries {
+interface CuratedSeries {
   id: number;
   name: string;
   posterPath: string | null;

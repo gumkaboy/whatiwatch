@@ -31,7 +31,7 @@ async function tmdbFetch<T>(path: string, params?: Record<string, string>): Prom
   return res.json() as Promise<T>;
 }
 
-export interface TmdbSeriesSummary {
+interface TmdbSeriesSummary {
   id: number;
   name: string;
   poster_path: string | null;
@@ -39,7 +39,7 @@ export interface TmdbSeriesSummary {
   overview: string;
 }
 
-export interface TmdbSeriesSearchResult {
+interface TmdbSeriesSearchResult {
   page: number;
   total_pages: number;
   total_results: number;
@@ -55,7 +55,7 @@ export interface TmdbSeason {
   air_date: string | null;
 }
 
-export interface TmdbSeriesDetails {
+interface TmdbSeriesDetails {
   id: number;
   name: string;
   overview: string;
@@ -76,7 +76,7 @@ export function searchSeries(query: string, page = 1) {
   return tmdbFetch<TmdbSeriesSearchResult>("/search/tv", { query, page: String(page) });
 }
 
-export interface PopularSeriesPage {
+interface PopularSeriesPage {
   items: { tmdbId: number; name: string; posterPath: string | null; year: string | null }[];
   hasMore: boolean;
 }
@@ -180,7 +180,7 @@ interface TmdbWatchProvidersResult {
   >;
 }
 
-export interface WatchProvidersResult {
+interface WatchProvidersResult {
   providers: WatchProvider[];
   watchPageUrl: string | null;
 }
@@ -254,7 +254,7 @@ export async function getSeriesExternalIds(tmdbId: number) {
   return tmdbFetch<TmdbExternalIds>(`/tv/${tmdbId}/external_ids`);
 }
 
-export interface TmdbBackdrop {
+interface TmdbBackdrop {
   file_path: string;
 }
 
