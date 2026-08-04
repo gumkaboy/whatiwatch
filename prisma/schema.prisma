@@ -53,8 +53,6 @@ model Series {
   posterPath     String?
   year           String?
   status         WatchStatus @default(PLANNED)
-  currentSeason  Int         @default(0)
-  currentEpisode Int         @default(0)
   rating         Float?
   backgroundPath String?
   createdAt      DateTime    @default(now())
