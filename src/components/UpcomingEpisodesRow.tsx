@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { tmdbImageUrl } from "@/lib/tmdb";
+import { formatUpcomingDate } from "@/lib/formatDate";
 
 type UpcomingEpisode = {
   tmdbId: number;
@@ -9,17 +10,6 @@ type UpcomingEpisode = {
   episodeNumber: number;
   airDate: string;
 };
-
-function formatAirDate(airDate: string) {
-  const date = new Date(airDate);
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  const diffDays = Math.round((date.getTime() - today.getTime()) / 86_400_000);
-
-  if (diffDays === 0) return "Сегодня";
-  if (diffDays === 1) return "Завтра";
-  return date.toLocaleDateString("ru-RU", { day: "numeric", month: "long" });
-}
 
 export function UpcomingEpisodesRow({ items }: { items: UpcomingEpisode[] }) {
   if (items.length === 0) {
@@ -49,7 +39,7 @@ export function UpcomingEpisodesRow({ items }: { items: UpcomingEpisode[] }) {
               <span className="upcoming-episode-episode">
                 Сезон {item.seasonNumber} · Серия {item.episodeNumber}
               </span>
-              <span className="upcoming-episode-date">{formatAirDate(item.airDate)}</span>
+              <span className="upcoming-episode-date">{formatUpcomingDate(item.airDate)}</span>
             </div>
           </Link>
         );

@@ -3,11 +3,13 @@ import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth";
 import { PosterCarouselRow } from "@/components/PosterCarouselRow";
 import { UpcomingEpisodesRow } from "@/components/UpcomingEpisodesRow";
+import { PremieresRow } from "@/components/PremieresRow";
 import {
   getSeriesDetails,
   getSeasonEpisodes,
   getPopularWellRatedSeries,
   getNextEpisodeToAir,
+  getUpcomingPremieres,
 } from "@/lib/tmdb";
 
 // см. пояснение в src/app/series/[id]/page.tsx — без этого fetch к TMDb
@@ -55,7 +57,7 @@ export default async function HomeDashboardPage() {
   const session = await auth();
   const userId = Number(session!.user.id);
 
-  const [lastWatchedBySeries, popularPage, watchingSeries] = await Promise.all([
+  const [lastWatchedBySeries, popularPage, watchingSeries, premieres] = await Promise.all([
     prisma.watchedEpisode.groupBy({
       by: ["tmdbId"],
       where: { userId },
@@ -65,6 +67,7 @@ export default async function HomeDashboardPage() {
     }),
     getPopularWellRatedSeries(),
     prisma.series.findMany({ where: { userId, status: "WATCHING" } }),
+    getUpcomingPremieres().catch(() => []),
   ]);
   const popular = popularPage.items;
 
@@ -134,6 +137,11 @@ export default async function HomeDashboardPage() {
       <section className="home-section">
         <h2 className="home-section-title">Скоро эпизоды</h2>
         <UpcomingEpisodesRow items={upcomingEpisodes} />
+      </section>
+
+      <section className="home-section">
+        <h2 className="home-section-title">Премьеры</h2>
+        <PremieresRow items={premieres} />
       </section>
 
       <section className="home-section">

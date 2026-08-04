@@ -1551,7 +1551,8 @@ a {
 .season-tab,
 .comment-item,
 .site-nav-links,
-.upcoming-episode-card {
+.upcoming-episode-card,
+.premiere-card {
   position: relative;
   background: linear-gradient(
     155deg,
@@ -1575,7 +1576,8 @@ a {
 .season-tab::before,
 .comment-item::before,
 .site-nav-links::before,
-.upcoming-episode-card::before {
+.upcoming-episode-card::before,
+.premiere-card::before {
   content: "";
   position: absolute;
   inset: 0;
@@ -1710,7 +1712,8 @@ a {
   display: none;
 }
 
-.upcoming-episode-card {
+.upcoming-episode-card,
+.premiere-card {
   display: flex;
   align-items: center;
   gap: 0.6rem;
@@ -1723,11 +1726,13 @@ a {
   transition: transform 0.2s ease;
 }
 
-.upcoming-episode-card:hover {
+.upcoming-episode-card:hover,
+.premiere-card:hover {
   transform: translateY(-2px);
 }
 
-.upcoming-episode-poster {
+.upcoming-episode-poster,
+.premiere-poster {
   width: 48px;
   height: 72px;
   object-fit: cover;
@@ -1735,14 +1740,16 @@ a {
   flex-shrink: 0;
 }
 
-.upcoming-episode-info {
+.upcoming-episode-info,
+.premiere-info {
   display: flex;
   flex-direction: column;
   gap: 0.2rem;
   min-width: 0;
 }
 
-.upcoming-episode-name {
+.upcoming-episode-name,
+.premiere-name {
   font-weight: 600;
   font-size: 0.85rem;
   display: -webkit-box;
@@ -1756,7 +1763,8 @@ a {
   color: rgba(255, 255, 255, 0.6);
 }
 
-.upcoming-episode-date {
+.upcoming-episode-date,
+.premiere-date {
   font-size: 0.8rem;
   color: #a78bfa;
   font-weight: 600;

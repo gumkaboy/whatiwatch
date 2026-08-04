@@ -111,8 +111,66 @@ export async function getPopularWellRatedSeries(page = 1): Promise<PopularSeries
   return { items, hasMore: page < data.total_pages };
 }
 
-export function getSeriesDetails(tmdbId: number) {
-  return tmdbFetch<TmdbSeriesDetails>(`/tv/${tmdbId}`);
+export interface UpcomingPremiere {
+  tmdbId: number;
+  name: string;
+  posterPath: string | null;
+  firstAirDate: string;
+}
+
+// сериалы, которые стартуют в ближайшие 2 недели — отдельная, общая для всех
+// пользователей подборка (в отличие от "Скоро эпизоды", завязанной на библиотеку).
+// Ограничиваем языком оригинала (en/ru) — без этого в топ по популярности
+// затесывается куча нигде не переведённых региональных шоу
+export async function getUpcomingPremieres(): Promise<UpcomingPremiere[]> {
+  const today = new Date();
+  const in14Days = new Date(today.getTime() + 14 * 86_400_000);
+  const format = (d: Date) => d.toISOString().slice(0, 10);
+
+  const baseParams = {
+    sort_by: "popularity.desc",
+    "first_air_date.gte": format(today),
+    "first_air_date.lte": format(in14Days),
+    without_genres: EXCLUDED_GENRE_IDS.join(","),
+  };
+
+  const [enResults, ruResults] = await Promise.all([
+    tmdbFetch<TmdbSeriesSearchResult>("/discover/tv", {
+      ...baseParams,
+      with_original_language: "en",
+    }),
+    tmdbFetch<TmdbSeriesSearchResult>("/discover/tv", {
+      ...baseParams,
+      with_original_language: "ru",
+    }),
+  ]);
+
+  const byId = new Map<number, TmdbSeriesSummary>();
+  for (const s of [...enResults.results, ...ruResults.results]) {
+    if (s.first_air_date) byId.set(s.id, s);
+  }
+
+  return Array.from(byId.values())
+    .map((s) => ({
+      tmdbId: s.id,
+      name: s.name,
+      posterPath: s.poster_path,
+      firstAirDate: s.first_air_date as string,
+    }))
+    .sort((a, b) => a.firstAirDate.localeCompare(b.firstAirDate));
+}
+
+export async function getSeriesDetails(tmdbId: number) {
+  const series = await tmdbFetch<TmdbSeriesDetails>(`/tv/${tmdbId}`);
+  if (series.overview) return series;
+
+  // у новых/малоизвестных сериалов русский перевод описания часто ещё не
+  // готов на TMDb — английское описание лучше пустого
+  const fallback = await tmdbFetch<TmdbSeriesDetails>(`/tv/${tmdbId}`, {
+    language: "en-US",
+  }).catch(() => null);
+
+  return fallback?.overview ? { ...series, overview: fallback.overview } : series;
 }
 
 interface TmdbVideo {
