@@ -149,7 +149,7 @@ export async function getUpcomingPremieres(): Promise<UpcomingPremiere[]> {
 
   const byId = new Map<number, TmdbSeriesSummary>();
   for (const s of [...enResults.results, ...ruResults.results]) {
-    if (s.first_air_date) byId.set(s.id, s);
+    if (s.first_air_date && s.poster_path) byId.set(s.id, s);
   }
 
   const base = Array.from(byId.values())
