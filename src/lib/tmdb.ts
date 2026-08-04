@@ -116,6 +116,8 @@ export interface UpcomingPremiere {
   name: string;
   posterPath: string | null;
   firstAirDate: string;
+  overview: string;
+  network: string | null;
 }
 
 // сериалы, которые стартуют в ближайшие 2 недели — отдельная, общая для всех
@@ -150,14 +152,26 @@ export async function getUpcomingPremieres(): Promise<UpcomingPremiere[]> {
     if (s.first_air_date) byId.set(s.id, s);
   }
 
-  return Array.from(byId.values())
+  const base = Array.from(byId.values())
     .map((s) => ({
       tmdbId: s.id,
       name: s.name,
       posterPath: s.poster_path,
       firstAirDate: s.first_air_date as string,
+      overview: s.overview,
     }))
     .sort((a, b) => a.firstAirDate.localeCompare(b.firstAirDate));
+
+  // "чьё производство" — есть только в полной карточке сериала, discover его не отдаёт
+  const networks = await Promise.all(
+    base.map((s) =>
+      getSeriesDetails(s.tmdbId)
+        .then((d) => d.networks[0]?.name ?? null)
+        .catch(() => null)
+    )
+  );
+
+  return base.map((s, i) => ({ ...s, network: networks[i] }));
 }
 
 export async function getSeriesDetails(tmdbId: number) {
