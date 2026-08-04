@@ -70,6 +70,11 @@ interface TmdbSeriesDetails {
   status: string;
   seasons: TmdbSeason[];
   networks: { id: number; name: string; logo_path: string | null }[];
+  next_episode_to_air: {
+    air_date: string | null;
+    episode_number: number;
+    season_number: number;
+  } | null;
 }
 
 export function searchSeries(query: string, page = 1) {
@@ -244,6 +249,24 @@ export async function getAiredEpisodeCount(tmdbId: number): Promise<number> {
   return episodesArrays
     .flat()
     .filter((ep) => ep.air_date && new Date(ep.air_date) <= now).length;
+}
+
+export interface NextEpisodeToAir {
+  seasonNumber: number;
+  episodeNumber: number;
+  airDate: string;
+}
+
+export async function getNextEpisodeToAir(tmdbId: number): Promise<NextEpisodeToAir | null> {
+  const series = await getSeriesDetails(tmdbId);
+  const next = series.next_episode_to_air;
+  if (!next || !next.air_date) return null;
+
+  return {
+    seasonNumber: next.season_number,
+    episodeNumber: next.episode_number,
+    airDate: next.air_date,
+  };
 }
 
 interface TmdbExternalIds {

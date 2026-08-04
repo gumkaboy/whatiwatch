@@ -2,7 +2,13 @@ import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth";
 import { PosterCarouselRow } from "@/components/PosterCarouselRow";
-import { getSeriesDetails, getSeasonEpisodes, getPopularWellRatedSeries } from "@/lib/tmdb";
+import { UpcomingEpisodesRow } from "@/components/UpcomingEpisodesRow";
+import {
+  getSeriesDetails,
+  getSeasonEpisodes,
+  getPopularWellRatedSeries,
+  getNextEpisodeToAir,
+} from "@/lib/tmdb";
 
 // см. пояснение в src/app/series/[id]/page.tsx — без этого fetch к TMDb
 // после auth()/cookies() не кэшируется вообще, несмотря на next.revalidate
@@ -29,11 +35,27 @@ async function hasUnwatchedAiredEpisodes(tmdbId: number, watchedCount: number) {
   }
 }
 
+async function getUpcomingEpisodes(
+  watchingSeries: { tmdbId: number; name: string; posterPath: string | null }[]
+) {
+  const results = await Promise.all(
+    watchingSeries.map(async (s) => {
+      const next = await getNextEpisodeToAir(s.tmdbId).catch(() => null);
+      if (!next) return null;
+      return { ...s, ...next };
+    })
+  );
+
+  return results
+    .filter((r): r is NonNullable<typeof r> => r !== null)
+    .sort((a, b) => a.airDate.localeCompare(b.airDate));
+}
+
 export default async function HomeDashboardPage() {
   const session = await auth();
   const userId = Number(session!.user.id);
 
-  const [lastWatchedBySeries, popularPage] = await Promise.all([
+  const [lastWatchedBySeries, popularPage, watchingSeries] = await Promise.all([
     prisma.watchedEpisode.groupBy({
       by: ["tmdbId"],
       where: { userId },
@@ -42,8 +64,17 @@ export default async function HomeDashboardPage() {
       orderBy: { _max: { watchedAt: "desc" } },
     }),
     getPopularWellRatedSeries(),
+    prisma.series.findMany({ where: { userId, status: "WATCHING" } }),
   ]);
   const popular = popularPage.items;
+
+  const upcomingEpisodes = await getUpcomingEpisodes(
+    watchingSeries.map((s) => ({
+      tmdbId: s.tmdbId,
+      name: s.name || "Без названия",
+      posterPath: s.posterPath,
+    }))
+  );
 
   const tmdbIds = lastWatchedBySeries.map((row) => row.tmdbId);
   const watchedCountByTmdbId = new Map(
@@ -98,6 +129,11 @@ export default async function HomeDashboardPage() {
           emptyMessage="Пока нечего продолжить — начните смотреть что-то из библиотеки."
           storageKey="continue-watching"
         />
+      </section>
+
+      <section className="home-section">
+        <h2 className="home-section-title">Скоро эпизоды</h2>
+        <UpcomingEpisodesRow items={upcomingEpisodes} />
       </section>
 
       <section className="home-section">
