@@ -17,7 +17,7 @@ export function PremieresRow({ items }: { items: Premiere[] }) {
   }
 
   return (
-    <div className="upcoming-episodes-row">
+    <div className="premieres-list">
       {items.map((item) => {
         const poster = tmdbImageUrl(item.posterPath, "w300");
         return (
