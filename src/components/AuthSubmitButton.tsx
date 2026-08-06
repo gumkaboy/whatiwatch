@@ -23,7 +23,10 @@ export function AuthSubmitButton({
         <span className="auth-submit-door">
           <span className="auth-submit-door-panel" />
         </span>
-        <span className="auth-submit-runner" />
+        <span className="auth-submit-runner">
+          <span className="auth-submit-runner-frame auth-submit-runner-frame-a" />
+          <span className="auth-submit-runner-frame auth-submit-runner-frame-b" />
+        </span>
       </span>
     </button>
   );

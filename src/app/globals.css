@@ -1158,25 +1158,26 @@ a {
   cursor: default;
 }
 
-/* кнопка входа: справа бегущий человечек добегает до двери,
-   стучит, дверь открывается — только пока реально идёт отправка
-   формы (useFormStatus), не по фиксированному таймеру */
+/* кнопка входа: справа бегущий человечек добегает до двери, стучит,
+   дверь открывается, он заходит — и цикл повторяется, пока реально
+   не придёт ответ сервера (useFormStatus), а не по таймеру. Поэтому
+   всё зациклено (infinite), а не одноразовая пробежка */
 .auth-form .auth-submit-btn {
   position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
   width: 100%;
-  padding: 0.85rem 3.6rem 0.85rem 1rem;
+  padding: 0.85rem 4.6rem 0.85rem 1rem;
   overflow: hidden;
 }
 
 .auth-submit-scene {
   position: absolute;
-  right: 0.85rem;
+  right: 0.9rem;
   top: 50%;
-  width: 26px;
-  height: 26px;
+  width: 46px;
+  height: 40px;
   transform: translateY(-50%);
   pointer-events: none;
 }
@@ -1185,30 +1186,38 @@ a {
   position: absolute;
   right: 0;
   top: 50%;
-  width: 9px;
-  height: 22px;
+  width: 17px;
+  height: 34px;
   transform: translateY(-50%);
-  border: 1.5px solid rgba(255, 255, 255, 0.7);
-  border-radius: 2px 2px 0 0;
-  background: rgba(0, 0, 0, 0.18);
-  perspective: 90px;
+  border: 2px solid rgba(255, 255, 255, 0.75);
+  border-radius: 3px 3px 0 0;
+  background: rgba(0, 0, 0, 0.2);
+  perspective: 130px;
   overflow: hidden;
 }
 
 .auth-submit-door-panel {
   position: absolute;
   inset: 0;
-  background: rgba(255, 255, 255, 0.85);
+  background: rgba(255, 255, 255, 0.88);
   transform-origin: left center;
 }
 
 .auth-submit-btn[data-pending="true"] .auth-submit-door-panel {
-  animation: auth-door-open 300ms 480ms var(--ease-smooth) forwards;
+  animation: auth-door-cycle 1500ms linear infinite;
 }
 
-@keyframes auth-door-open {
-  to {
+@keyframes auth-door-cycle {
+  0%,
+  64% {
+    transform: rotateY(0deg);
+  }
+  80%,
+  92% {
     transform: rotateY(-100deg);
+  }
+  100% {
+    transform: rotateY(0deg);
   }
 }
 
@@ -1216,9 +1225,21 @@ a {
   position: absolute;
   left: 0;
   top: 50%;
-  width: 18px;
-  height: 22px;
+  width: 24px;
+  height: 30px;
   transform: translateY(-50%);
+}
+
+.auth-submit-btn[data-pending="true"] .auth-submit-runner {
+  animation:
+    auth-run-cycle 1500ms var(--ease-smooth) infinite,
+    auth-knock-tilt 1500ms linear infinite,
+    auth-run-shrink 1500ms var(--ease-smooth) infinite;
+}
+
+.auth-submit-runner-frame {
+  position: absolute;
+  inset: 0;
   background-color: #fff;
   mask-image: url("/free-icon-running-man-76846.png");
   mask-size: contain;
@@ -1228,63 +1249,86 @@ a {
   -webkit-mask-size: contain;
   -webkit-mask-repeat: no-repeat;
   -webkit-mask-position: center;
-  opacity: 0;
 }
 
-.auth-submit-btn[data-pending="true"] .auth-submit-runner {
-  animation:
-    auth-run-move 820ms var(--ease-smooth) forwards,
-    auth-run-knock 820ms linear forwards,
-    auth-run-shrink 820ms var(--ease-smooth) forwards;
+/* два кадра одного силуэта, зеркальные — быстрое чередование
+   создаёт эффект переставляемых при беге ног без спрайт-листа */
+.auth-submit-runner-frame-b {
+  transform: scaleX(-1);
 }
 
-@keyframes auth-run-move {
+.auth-submit-btn[data-pending="true"] .auth-submit-runner-frame-a {
+  animation: auth-stride-flip 260ms linear infinite;
+}
+
+.auth-submit-btn[data-pending="true"] .auth-submit-runner-frame-b {
+  animation: auth-stride-flip 260ms linear infinite reverse;
+}
+
+@keyframes auth-stride-flip {
+  0%,
+  49% {
+    opacity: 1;
+  }
+  50%,
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes auth-run-cycle {
   0% {
     translate: 0 0;
     opacity: 0;
   }
-  8% {
+  5% {
     opacity: 1;
   }
-  16% {
-    translate: 2px -2px;
+  44% {
+    translate: 14px 0;
   }
-  28% {
-    translate: 5px 0;
+  48% {
+    translate: 18px 0;
   }
-  40% {
-    translate: 8px -2px;
-  }
-  52% {
-    translate: 11px 0;
-  }
-  58% {
+  51% {
     translate: 13px 0;
   }
-  70% {
+  55% {
+    translate: 18px 0;
+  }
+  59% {
     translate: 13px 0;
   }
+  64%,
+  80% {
+    translate: 14px 0;
+    opacity: 1;
+  }
+  92%,
   100% {
-    translate: 20px 0;
+    translate: 22px 0;
     opacity: 0;
   }
 }
 
-@keyframes auth-run-knock {
+@keyframes auth-knock-tilt {
   0%,
-  56% {
+  46% {
     rotate: 0deg;
   }
-  59% {
+  48% {
     rotate: -10deg;
   }
-  62% {
-    rotate: 7deg;
+  51% {
+    rotate: 8deg;
   }
-  65% {
-    rotate: -4deg;
+  55% {
+    rotate: -8deg;
   }
-  68%,
+  59% {
+    rotate: 6deg;
+  }
+  62%,
   100% {
     rotate: 0deg;
   }
@@ -1292,11 +1336,11 @@ a {
 
 @keyframes auth-run-shrink {
   0%,
-  70% {
+  80% {
     scale: 1;
   }
   100% {
-    scale: 0.4;
+    scale: 0.5;
   }
 }
 
