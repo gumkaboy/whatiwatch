@@ -21,11 +21,16 @@ export function AuthSubmitButton({
       <span>{pending ? pendingLabel : label}</span>
       <span className="auth-submit-scene" aria-hidden="true">
         <span className="auth-submit-door">
+          <span className="auth-submit-door-frame" />
           <span className="auth-submit-door-panel" />
         </span>
         <span className="auth-submit-runner">
-          <span className="auth-submit-runner-frame auth-submit-runner-frame-a" />
-          <span className="auth-submit-runner-frame auth-submit-runner-frame-b" />
+          <span className="auth-runner-head" />
+          <span className="auth-runner-arm auth-runner-arm-a" />
+          <span className="auth-runner-arm auth-runner-arm-b" />
+          <span className="auth-runner-torso" />
+          <span className="auth-runner-leg auth-runner-leg-a" />
+          <span className="auth-runner-leg auth-runner-leg-b" />
         </span>
       </span>
     </button>

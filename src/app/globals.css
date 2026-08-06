@@ -1180,44 +1180,61 @@ a {
   height: 40px;
   transform: translateY(-50%);
   pointer-events: none;
+  opacity: 0;
 }
 
+.auth-submit-btn[data-pending="true"] .auth-submit-scene {
+  opacity: 1;
+}
+
+/* дверь — скруглённый глянцевый брусочек, не рамка с перспективой;
+   открытие — плоский 2D-поворот панели вокруг левого края, поверх
+   всегда видимого тёмного проёма позади неё */
 .auth-submit-door {
   position: absolute;
-  right: 0;
+  right: 2px;
   top: 50%;
-  width: 17px;
-  height: 34px;
+  width: 13px;
+  height: 30px;
   transform: translateY(-50%);
-  border: 2px solid rgba(255, 255, 255, 0.75);
-  border-radius: 3px 3px 0 0;
-  background: rgba(0, 0, 0, 0.2);
-  perspective: 130px;
-  overflow: hidden;
+  overflow: visible;
+}
+
+.auth-submit-door-frame {
+  position: absolute;
+  inset: 0;
+  border-radius: 5px;
+  background: rgba(0, 0, 0, 0.35);
 }
 
 .auth-submit-door-panel {
   position: absolute;
   inset: 0;
-  background: rgba(255, 255, 255, 0.88);
+  border-radius: 5px;
+  background: linear-gradient(
+    100deg,
+    rgba(255, 255, 255, 0.65) 0%,
+    rgba(255, 255, 255, 0.95) 45%,
+    rgba(255, 255, 255, 0.65) 100%
+  );
   transform-origin: left center;
 }
 
 .auth-submit-btn[data-pending="true"] .auth-submit-door-panel {
-  animation: auth-door-cycle 1500ms linear infinite;
+  animation: auth-door-cycle 1500ms var(--ease-smooth) infinite;
 }
 
 @keyframes auth-door-cycle {
   0%,
   64% {
-    transform: rotateY(0deg);
+    rotate: 0deg;
   }
   80%,
-  92% {
-    transform: rotateY(-100deg);
+  94% {
+    rotate: -110deg;
   }
   100% {
-    transform: rotateY(0deg);
+    rotate: 0deg;
   }
 }
 
@@ -1225,8 +1242,8 @@ a {
   position: absolute;
   left: 0;
   top: 50%;
-  width: 24px;
-  height: 30px;
+  width: 16px;
+  height: 28px;
   transform: translateY(-50%);
 }
 
@@ -1237,42 +1254,78 @@ a {
     auth-run-shrink 1500ms var(--ease-smooth) infinite;
 }
 
-.auth-submit-runner-frame {
+.auth-runner-head {
   position: absolute;
-  inset: 0;
-  background-color: #fff;
-  mask-image: url("/free-icon-running-man-76846.png");
-  mask-size: contain;
-  mask-repeat: no-repeat;
-  mask-position: center;
-  -webkit-mask-image: url("/free-icon-running-man-76846.png");
-  -webkit-mask-size: contain;
-  -webkit-mask-repeat: no-repeat;
-  -webkit-mask-position: center;
+  top: 0;
+  left: 50%;
+  width: 7px;
+  height: 7px;
+  margin-left: -3.5px;
+  border-radius: 50%;
+  background: #fff;
 }
 
-/* два кадра одного силуэта, зеркальные — быстрое чередование
-   создаёт эффект переставляемых при беге ног без спрайт-листа */
-.auth-submit-runner-frame-b {
-  transform: scaleX(-1);
+.auth-runner-torso {
+  position: absolute;
+  top: 7px;
+  left: 50%;
+  width: 4.5px;
+  height: 10px;
+  margin-left: -2.25px;
+  border-radius: 2px;
+  background: #fff;
 }
 
-.auth-submit-btn[data-pending="true"] .auth-submit-runner-frame-a {
-  animation: auth-stride-flip 260ms linear infinite;
+.auth-runner-arm,
+.auth-runner-leg {
+  position: absolute;
+  left: 50%;
+  border-radius: 1.5px;
+  background: rgba(255, 255, 255, 0.9);
+  transform-origin: top center;
 }
 
-.auth-submit-btn[data-pending="true"] .auth-submit-runner-frame-b {
-  animation: auth-stride-flip 260ms linear infinite reverse;
+.auth-runner-arm {
+  top: 8px;
+  width: 2.5px;
+  height: 7px;
+  margin-left: -1.25px;
 }
 
-@keyframes auth-stride-flip {
+.auth-runner-leg {
+  top: 16px;
+  width: 3px;
+  height: 11px;
+  margin-left: -1.5px;
+}
+
+.auth-submit-btn[data-pending="true"] .auth-runner-leg-a,
+.auth-submit-btn[data-pending="true"] .auth-runner-arm-b {
+  animation: auth-limb-swing-a 260ms ease-in-out infinite;
+}
+
+.auth-submit-btn[data-pending="true"] .auth-runner-leg-b,
+.auth-submit-btn[data-pending="true"] .auth-runner-arm-a {
+  animation: auth-limb-swing-b 260ms ease-in-out infinite;
+}
+
+@keyframes auth-limb-swing-a {
   0%,
-  49% {
-    opacity: 1;
-  }
-  50%,
   100% {
-    opacity: 0;
+    rotate: 32deg;
+  }
+  50% {
+    rotate: -32deg;
+  }
+}
+
+@keyframes auth-limb-swing-b {
+  0%,
+  100% {
+    rotate: -32deg;
+  }
+  50% {
+    rotate: 32deg;
   }
 }
 
@@ -1285,28 +1338,28 @@ a {
     opacity: 1;
   }
   44% {
-    translate: 14px 0;
+    translate: 16px 0;
   }
   48% {
-    translate: 18px 0;
+    translate: 20px 0;
   }
   51% {
-    translate: 13px 0;
+    translate: 15px 0;
   }
   55% {
-    translate: 18px 0;
+    translate: 20px 0;
   }
   59% {
-    translate: 13px 0;
+    translate: 15px 0;
   }
   64%,
   80% {
-    translate: 14px 0;
+    translate: 16px 0;
     opacity: 1;
   }
   92%,
   100% {
-    translate: 22px 0;
+    translate: 26px 0;
     opacity: 0;
   }
 }
@@ -1317,16 +1370,16 @@ a {
     rotate: 0deg;
   }
   48% {
-    rotate: -10deg;
+    rotate: -12deg;
   }
   51% {
-    rotate: 8deg;
+    rotate: 9deg;
   }
   55% {
-    rotate: -8deg;
+    rotate: -9deg;
   }
   59% {
-    rotate: 6deg;
+    rotate: 7deg;
   }
   62%,
   100% {
