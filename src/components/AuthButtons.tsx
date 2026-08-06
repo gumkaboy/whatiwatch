@@ -5,6 +5,7 @@ import { createPortal } from "react-dom";
 import Link from "next/link";
 import { loginAction } from "@/app/login/actions";
 import { registerAction } from "@/app/register/actions";
+import { AuthSubmitButton } from "@/components/AuthSubmitButton";
 
 type Mode = "login" | "register" | null;
 
@@ -46,7 +47,7 @@ export function AuthButtons() {
                     <label htmlFor="modal-password">Пароль</label>
                     <input id="modal-password" name="password" type="password" required />
                   </div>
-                  <button type="submit">Войти</button>
+                  <AuthSubmitButton label="Войти" pendingLabel="Вход..." />
                 </form>
                 <p>
                   <Link href="/forgot-password">Забыли пароль?</Link>
