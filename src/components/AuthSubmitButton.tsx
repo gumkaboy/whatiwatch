@@ -12,16 +12,19 @@ export function AuthSubmitButton({
   const { pending } = useFormStatus();
 
   return (
-    <div className="auth-submit-wrap">
-      <div className="auth-door-scene" data-active={pending}>
-        <div className="auth-door-frame">
-          <div className="auth-door-panel" />
-        </div>
-        <div className="auth-walker" />
-      </div>
-      <button type="submit" disabled={pending}>
-        {pending ? pendingLabel : label}
-      </button>
-    </div>
+    <button
+      type="submit"
+      className="auth-submit-btn"
+      disabled={pending}
+      data-pending={pending}
+    >
+      <span>{pending ? pendingLabel : label}</span>
+      <span className="auth-submit-scene" aria-hidden="true">
+        <span className="auth-submit-door">
+          <span className="auth-submit-door-panel" />
+        </span>
+        <span className="auth-submit-runner" />
+      </span>
+    </button>
   );
 }

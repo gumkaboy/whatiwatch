@@ -1153,61 +1153,57 @@ a {
   background: #6d28d9;
 }
 
-.auth-form button:hover {
-  background: rgba(128, 128, 128, 0.12);
-}
-
 .auth-form button:disabled {
-  opacity: 0.85;
+  opacity: 0.9;
   cursor: default;
 }
 
-.auth-submit-wrap {
+/* кнопка входа: справа бегущий человечек добегает до двери,
+   стучит, дверь открывается — только пока реально идёт отправка
+   формы (useFormStatus), не по фиксированному таймеру */
+.auth-form .auth-submit-btn {
   position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 0.85rem 3.6rem 0.85rem 1rem;
+  overflow: hidden;
 }
 
-/* маленькая сцена "человечек заходит в дверь" — только пока идёт
-   реальная отправка формы (useFormStatus), не фиксированная задержка */
-.auth-door-scene {
+.auth-submit-scene {
   position: absolute;
-  left: 50%;
-  bottom: 100%;
-  transform: translateX(-50%);
-  margin-bottom: 0.6rem;
-  width: 34px;
-  height: 34px;
-  opacity: 0;
+  right: 0.85rem;
+  top: 50%;
+  width: 26px;
+  height: 26px;
+  transform: translateY(-50%);
   pointer-events: none;
 }
 
-.auth-door-scene[data-active="true"] {
-  animation: auth-door-scene-in 150ms var(--ease-smooth) forwards;
+.auth-submit-door {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  width: 9px;
+  height: 22px;
+  transform: translateY(-50%);
+  border: 1.5px solid rgba(255, 255, 255, 0.7);
+  border-radius: 2px 2px 0 0;
+  background: rgba(0, 0, 0, 0.18);
+  perspective: 90px;
+  overflow: hidden;
 }
 
-@keyframes auth-door-scene-in {
-  to {
-    opacity: 1;
-  }
-}
-
-.auth-door-frame {
+.auth-submit-door-panel {
   position: absolute;
   inset: 0;
-  border: 2px solid rgba(167, 139, 250, 0.55);
-  border-radius: 4px 4px 0 0;
-  background: rgba(10, 8, 18, 0.5);
-  perspective: 200px;
-}
-
-.auth-door-panel {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(160deg, #7c3aed, #4c1d95);
+  background: rgba(255, 255, 255, 0.85);
   transform-origin: left center;
 }
 
-.auth-door-scene[data-active="true"] .auth-door-panel {
-  animation: auth-door-open 450ms 300ms var(--ease-smooth) forwards;
+.auth-submit-btn[data-pending="true"] .auth-submit-door-panel {
+  animation: auth-door-open 300ms 480ms var(--ease-smooth) forwards;
 }
 
 @keyframes auth-door-open {
@@ -1216,45 +1212,91 @@ a {
   }
 }
 
-.auth-walker {
+.auth-submit-runner {
   position: absolute;
-  bottom: 2px;
-  left: 2px;
-  width: 6px;
-  height: 12px;
-  border-radius: 3px;
-  background: #ede9fe;
+  left: 0;
+  top: 50%;
+  width: 18px;
+  height: 22px;
+  transform: translateY(-50%);
+  background-color: #fff;
+  mask-image: url("/free-icon-running-man-76846.png");
+  mask-size: contain;
+  mask-repeat: no-repeat;
+  mask-position: center;
+  -webkit-mask-image: url("/free-icon-running-man-76846.png");
+  -webkit-mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-position: center;
   opacity: 0;
 }
 
-.auth-door-scene[data-active="true"] .auth-walker {
+.auth-submit-btn[data-pending="true"] .auth-submit-runner {
   animation:
-    auth-walk 550ms 120ms var(--ease-smooth) forwards,
-    auth-walk-bob 220ms ease-in-out 120ms 2;
+    auth-run-move 820ms var(--ease-smooth) forwards,
+    auth-run-knock 820ms linear forwards,
+    auth-run-shrink 820ms var(--ease-smooth) forwards;
 }
 
-@keyframes auth-walk {
+@keyframes auth-run-move {
   0% {
-    transform: translateX(0) scale(1);
+    translate: 0 0;
+    opacity: 0;
+  }
+  8% {
     opacity: 1;
   }
-  75% {
-    transform: translateX(20px) scale(1);
-    opacity: 1;
+  16% {
+    translate: 2px -2px;
+  }
+  28% {
+    translate: 5px 0;
+  }
+  40% {
+    translate: 8px -2px;
+  }
+  52% {
+    translate: 11px 0;
+  }
+  58% {
+    translate: 13px 0;
+  }
+  70% {
+    translate: 13px 0;
   }
   100% {
-    transform: translateX(24px) scale(0.5);
+    translate: 20px 0;
     opacity: 0;
   }
 }
 
-@keyframes auth-walk-bob {
+@keyframes auth-run-knock {
   0%,
-  100% {
-    translate: 0 0;
+  56% {
+    rotate: 0deg;
   }
-  50% {
-    translate: 0 -1.5px;
+  59% {
+    rotate: -10deg;
+  }
+  62% {
+    rotate: 7deg;
+  }
+  65% {
+    rotate: -4deg;
+  }
+  68%,
+  100% {
+    rotate: 0deg;
+  }
+}
+
+@keyframes auth-run-shrink {
+  0%,
+  70% {
+    scale: 1;
+  }
+  100% {
+    scale: 0.4;
   }
 }
 
