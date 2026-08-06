@@ -53,6 +53,7 @@ export function PosterCarouselRow({
 
   useEffect(() => {
     if (!needsCarousel) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     const track = trackRef.current;
     if (!track) return;
 

@@ -2,6 +2,19 @@
   --background: #ffffff;
   --foreground: #171717;
   --scroll-progress: 0;
+  /* production-polish deceleration, no overshoot — Jakub Krehel's bounce:0 spring translated to CSS */
+  --ease-smooth: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
 
 @media (prefers-color-scheme: dark) {
@@ -1144,6 +1157,107 @@ a {
   background: rgba(128, 128, 128, 0.12);
 }
 
+.auth-form button:disabled {
+  opacity: 0.85;
+  cursor: default;
+}
+
+.auth-submit-wrap {
+  position: relative;
+}
+
+/* маленькая сцена "человечек заходит в дверь" — только пока идёт
+   реальная отправка формы (useFormStatus), не фиксированная задержка */
+.auth-door-scene {
+  position: absolute;
+  left: 50%;
+  bottom: 100%;
+  transform: translateX(-50%);
+  margin-bottom: 0.6rem;
+  width: 34px;
+  height: 34px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.auth-door-scene[data-active="true"] {
+  animation: auth-door-scene-in 150ms var(--ease-smooth) forwards;
+}
+
+@keyframes auth-door-scene-in {
+  to {
+    opacity: 1;
+  }
+}
+
+.auth-door-frame {
+  position: absolute;
+  inset: 0;
+  border: 2px solid rgba(167, 139, 250, 0.55);
+  border-radius: 4px 4px 0 0;
+  background: rgba(10, 8, 18, 0.5);
+  perspective: 200px;
+}
+
+.auth-door-panel {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(160deg, #7c3aed, #4c1d95);
+  transform-origin: left center;
+}
+
+.auth-door-scene[data-active="true"] .auth-door-panel {
+  animation: auth-door-open 450ms 300ms var(--ease-smooth) forwards;
+}
+
+@keyframes auth-door-open {
+  to {
+    transform: rotateY(-100deg);
+  }
+}
+
+.auth-walker {
+  position: absolute;
+  bottom: 2px;
+  left: 2px;
+  width: 6px;
+  height: 12px;
+  border-radius: 3px;
+  background: #ede9fe;
+  opacity: 0;
+}
+
+.auth-door-scene[data-active="true"] .auth-walker {
+  animation:
+    auth-walk 550ms 120ms var(--ease-smooth) forwards,
+    auth-walk-bob 220ms ease-in-out 120ms 2;
+}
+
+@keyframes auth-walk {
+  0% {
+    transform: translateX(0) scale(1);
+    opacity: 1;
+  }
+  75% {
+    transform: translateX(20px) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(24px) scale(0.5);
+    opacity: 0;
+  }
+}
+
+@keyframes auth-walk-bob {
+  0%,
+  100% {
+    translate: 0 0;
+  }
+  50% {
+    translate: 0 -1.5px;
+  }
+}
+
 .auth-error {
   color: #d33;
   margin-top: 0.75rem;
@@ -1219,7 +1333,7 @@ a {
   border-radius: 8px;
   overflow: hidden;
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition: transform 0.2s var(--ease-smooth), box-shadow 0.2s var(--ease-smooth);
   flex-shrink: 0;
 }
 
@@ -1603,6 +1717,35 @@ a {
   gap: 2.5rem;
 }
 
+@keyframes home-section-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+    filter: blur(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
+  }
+}
+
+.home-section {
+  animation: home-section-in 0.4s var(--ease-smooth) both;
+}
+
+.home-section:nth-of-type(2) {
+  animation-delay: 0.05s;
+}
+
+.home-section:nth-of-type(3) {
+  animation-delay: 0.1s;
+}
+
+.home-section:nth-of-type(4) {
+  animation-delay: 0.15s;
+}
+
 .home-search {
   display: flex;
   align-items: center;
@@ -1620,6 +1763,13 @@ a {
   background: rgba(255, 255, 255, 0.05);
   color: inherit;
   font-size: 1.05rem;
+  transition: border-color 0.15s var(--ease-smooth), background 0.15s var(--ease-smooth);
+}
+
+.home-search input[type="text"]:focus {
+  border-color: rgba(167, 139, 250, 0.6);
+  background: rgba(255, 255, 255, 0.08);
+  outline: none;
 }
 
 .home-search button {
@@ -1630,10 +1780,15 @@ a {
   color: inherit;
   cursor: pointer;
   font-size: 1.05rem;
+  transition: background 0.15s var(--ease-smooth), transform 0.1s var(--ease-smooth);
 }
 
 .home-search button:hover {
   background: rgba(128, 128, 128, 0.15);
+}
+
+.home-search button:active {
+  transform: scale(0.97);
 }
 
 .home-section-title {
@@ -1694,10 +1849,15 @@ a {
   font-size: 1.3rem;
   line-height: 1;
   cursor: pointer;
+  transition: background 0.15s var(--ease-smooth), transform 0.1s var(--ease-smooth);
 }
 
 .poster-carousel-arrow:hover {
   background: rgba(128, 128, 128, 0.2);
+}
+
+.poster-carousel-arrow:active {
+  transform: scale(0.92);
 }
 
 .upcoming-episodes-row {
@@ -1722,11 +1882,16 @@ a {
   border-radius: 10px;
   color: inherit;
   text-decoration: none;
-  transition: transform 0.2s ease;
+  transition: transform 0.2s var(--ease-smooth), box-shadow 0.2s var(--ease-smooth);
 }
 
 .upcoming-episode-card:hover {
   transform: translateY(-2px);
+  box-shadow:
+    0 10px 28px rgba(0, 0, 0, 0.4),
+    0 1.5px 3px rgba(0, 0, 0, 0.2),
+    inset 0 1px 1px rgba(255, 255, 255, 0.55),
+    inset 0 -14px 20px -16px rgba(255, 255, 255, 0.16);
 }
 
 .upcoming-episode-poster {
@@ -1779,11 +1944,16 @@ a {
   border-radius: 10px;
   color: inherit;
   text-decoration: none;
-  transition: transform 0.2s ease;
+  transition: transform 0.2s var(--ease-smooth), box-shadow 0.2s var(--ease-smooth);
 }
 
 .premiere-card:hover {
   transform: translateY(-2px);
+  box-shadow:
+    0 10px 28px rgba(0, 0, 0, 0.4),
+    0 1.5px 3px rgba(0, 0, 0, 0.2),
+    inset 0 1px 1px rgba(255, 255, 255, 0.55),
+    inset 0 -14px 20px -16px rgba(255, 255, 255, 0.16);
 }
 
 .premiere-poster {
