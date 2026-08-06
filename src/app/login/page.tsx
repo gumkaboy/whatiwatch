@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { loginAction } from "./actions";
+import { AuthSubmitButton } from "@/components/AuthSubmitButton";
 
 const ERROR_MESSAGES: Record<string, string> = {
   CredentialsSignin: "Неверный email или пароль.",
@@ -26,7 +27,7 @@ export default async function LoginPage({
           <label htmlFor="password">Пароль</label>
           <input id="password" name="password" type="password" required />
         </div>
-        <button type="submit">Войти</button>
+        <AuthSubmitButton label="Войти" pendingLabel="Вход..." />
       </form>
       <p>
         <Link href="/forgot-password">Забыли пароль?</Link>
